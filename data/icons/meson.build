@@ -1,4 +1,4 @@
-application_id = 'com.github.philippkosarev.bmi'
+application_id = 'io.github.philippkosarev.bmi'
 
 scalable_dir = 'hicolor' / 'scalable' / 'apps'
 install_data(

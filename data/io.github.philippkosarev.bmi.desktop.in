@@ -2,7 +2,7 @@
 Name=BMI
 Comment=Calculate body mass index
 Exec=bmi
-Icon=com.github.philippkosarev.bmi
+Icon=io.github.philippkosarev.bmi
 Terminal=false
 Type=Application
 Categories=Utility;

@@ -31,7 +31,7 @@ class BmiApplication(Adw.Application):
     """The main application singleton class."""
 
     def __init__(self):
-        super().__init__(application_id='com.github.philippkosarev.bmi',
+        super().__init__(application_id='io.github.philippkosarev.bmi',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
         self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
 

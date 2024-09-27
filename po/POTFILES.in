@@ -1,7 +1,7 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
-data/com.github.philippkosarev.bmi.desktop.in
-data/com.github.philippkosarev.bmi.metainfo.xml.in
-data/com.github.philippkosarev.bmi.gschema.xml
+data/io.github.philippkosarev.bmi.desktop.in
+data/io.github.philippkosarev.bmi.metainfo.xml.in
+data/io.github.philippkosarev.bmi.gschema.xml
 src/main.py
 src/window.py

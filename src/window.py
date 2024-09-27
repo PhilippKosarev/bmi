@@ -165,7 +165,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
     def show_about(self, _button):
         self.about = Adw.AboutWindow(application_name='BMI',
-                                application_icon='com.github.philippkosarev.bmi',
+                                application_icon='io.github.philippkosarev.bmi',
                                 developer_name='Philipp Kosarev',
                                 version='1.0',
                                 developers=['Philipp Kosarev'],
