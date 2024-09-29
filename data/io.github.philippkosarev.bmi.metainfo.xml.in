@@ -5,13 +5,13 @@
   <project_license>GPL-2.0-or-later</project_license>
 
   <name>BMI</name>
-  <summary>Keep the summary shorter, between 10 and 35 characters</summary>
+  <summary>A body mass index calculator</summary>
   <description>
-    <p>No description</p>
+    <p>BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita. </p>
   </description>
 
   <developer id="tld.vendor">
-    <name>Developer name</name>
+    <name>Philipp Kosarev</name>
   </developer>
 
   <!-- Requered: Should be a link to the upstream homepage for the component -->
@@ -42,29 +42,29 @@
 
   <!-- Applications should set a brand color in both light and dark variants like so -->
   <branding>
-    <color type="primary" scheme_preference="light">#ff00ff</color>
-    <color type="primary" scheme_preference="dark">#993d3d</color>
+    <color type="primary" scheme_preference="light">#f6f5f4</color>
+    <color type="primary" scheme_preference="dark">#3a3543</color>
   </branding>
 
   <screenshots>
     <screenshot type="default">
-      <image>https://example.org/example1.png</image>
-      <caption>A caption</caption>
+      <image>https://github.com/PhilippKosarev/bmi/blob/main/screenshot.png</image>
+      <caption>BMI Dark Theme</caption>
     </screenshot>
     <screenshot>
-      <image>https://example.org/example2.png</image>
-      <caption>A caption</caption>
+      <image>https://github.com/PhilippKosarev/bmi/blob/main/screenshot2.png</image>
+      <caption>BMI Light Theme</caption>
     </screenshot>
   </screenshots>
 
   <releases>
-    <release version="1.0.1" date="2024-01-18">
-      <url type="details">https://example.org/changelog.html#version_1.0.1</url>
+    <release version="1.1" date="2024-9-28">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.1</url>
       <description translate="no">
-        <p>Release description</p>
+        <p>Preparing for Flathub release</p>
         <ul>
-          <li>List of changes</li>
-          <li>List of changes</li>
+          <li>Changed app id to io.github.philippkosarev.bmi</li>
+          <li>Updated manifest and metainfo files</li>
         </ul>
       </description>
     </release>
