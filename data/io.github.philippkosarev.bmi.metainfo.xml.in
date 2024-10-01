@@ -58,13 +58,12 @@
   </screenshots>
 
   <releases>
-    <release version="1.1" date="2024-9-28">
-      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.1</url>
+    <release version="v1.2" date="2024-10-1">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.2</url>
       <description translate="no">
         <p>Preparing for Flathub release</p>
         <ul>
-          <li>Changed app id to io.github.philippkosarev.bmi</li>
-          <li>Updated manifest and metainfo files</li>
+          <li>Non-user facing changes</li>
         </ul>
       </description>
     </release>
