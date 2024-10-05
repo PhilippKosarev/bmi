@@ -57,6 +57,17 @@
     </screenshot>
   </screenshots>
 
+  <requires>
+    <display_length compare="ge">600</display_length>
+    <internet>offline-only</internet>
+  </requires>
+
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+    <control>touch</control>
+  </supports>
+
   <releases>
     <release version="v1.2" date="2024-10-1">
       <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.2</url>
