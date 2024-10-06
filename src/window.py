@@ -33,8 +33,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
         # Basic properties
         self.set_title("BMI")
-        self.set_default_size(600, 290)
-        #self.set_size_request(440, 240)
+        self.set_default_size(0, 260)
         self.set_resizable(False)
 
         # Window structure
@@ -66,7 +65,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.left_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.CENTER)
         self.left_page.set_hexpand(True)
         self.left_page.set_vexpand(True)
-        self.left_page.set_size_request(230, 0)
+        self.left_page.set_size_request(270, 0)
         self.main_box.append(self.left_page)
 
         self.left_group = Adw.PreferencesGroup()
@@ -170,7 +169,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.about = Adw.AboutWindow(application_name='BMI',
                                 application_icon='io.github.philippkosarev.bmi',
                                 developer_name='Philipp Kosarev',
-                                version='v1.2',
+                                version='v1.3',
                                 developers=['Philipp Kosarev'],
                                 artists=['Philipp Kosarev'],
                                 copyright='© 2024 Philipp Kosarev',
