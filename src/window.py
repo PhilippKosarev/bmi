@@ -114,7 +114,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_button = Gtk.Button(halign=Gtk.Align.CENTER)
         self.result_button.set_tooltip_text("Copy BMI")
         self.result_button.set_css_classes(["pill", "title-1"])
-        self.result_button.set_label(str(self.bmi))
+        self.result_button.set_label(str(int(self.bmi)))
         self.result_button.connect('clicked', self.on_result_button_pressed)
         self.right_box.append(self.result_button)
 
@@ -134,25 +134,28 @@ class BmiWindow(Adw.ApplicationWindow):
         self.bmi = self.height_adjustment.get_value() / 100 # converting cm to meters
         self.bmi = self.bmi ** 2
         self.bmi = self.weight_adjustment.get_value() / self.bmi
-        self.bmi = "%.0f" % self.bmi # removing numbers after decimal point
+        # self.bmi = "%.2f" % self.bmi # removing numbers after decimal point
+        # self.bmi = round(self.bmi, 5)
+
 
     def on_value_changed(self, _scroll):
         self.calc_bmi()
+        print(self.bmi)
 
-        self.result_button.set_label(self.bmi)
-        if int(self.bmi) < 18:
+        self.result_button.set_label(str(int(self.bmi)))
+        if self.bmi < 18:
             self.result_feedback_label.set_css_classes(["title-2", "accent"])
             self.result_feedback_label.set_label("Underweight")
-        elif int(self.bmi) > 18  and int(self.bmi) < 24:
+        if self.bmi >= 18:
             self.result_feedback_label.set_css_classes(["title-2", "success"])
             self.result_feedback_label.set_label("Healthy")
-        elif int(self.bmi) > 24 and int(self.bmi) < 29:
+        if self.bmi >= 25:
             self.result_feedback_label.set_css_classes(["title-2", "warning"])
             self.result_feedback_label.set_label("Overweight")
-        elif int(self.bmi) > 29 and int(self.bmi) < 39:
+        if self.bmi >= 30:
             self.result_feedback_label.set_css_classes(["title-2", "error"])
             self.result_feedback_label.set_label("Obese")
-        elif int(self.bmi) > 39:
+        if self.bmi >= 40:
             self.result_feedback_label.set_css_classes(["title-2"])
             self.result_feedback_label.set_label("Extremely obese")
 
@@ -175,3 +178,4 @@ class BmiWindow(Adw.ApplicationWindow):
                                 website="https://github.com/philippkosarev/bmi",
                                 issue_url="https://github.com/philippkosarev/bmi/issues")
         self.about.present()
+
