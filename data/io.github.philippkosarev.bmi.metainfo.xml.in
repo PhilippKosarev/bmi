@@ -5,9 +5,9 @@
   <project_license>GPL-2.0-or-later</project_license>
 
   <name>BMI</name>
-  <summary>A body mass index calculator</summary>
+  <summary>Body mass index calculator</summary>
   <description>
-    <p>BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita. </p>
+    <p>BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita.</p>
   </description>
 
   <developer id="tld.vendor">
@@ -42,7 +42,7 @@
 
   <!-- Applications should set a brand color in both light and dark variants like so -->
   <branding>
-    <color type="primary" scheme_preference="light">#f6f5f4</color>
+    <color type="primary" scheme_preference="light">#c2daf7</color>
     <color type="primary" scheme_preference="dark">#3a3543</color>
   </branding>
 
@@ -69,12 +69,15 @@
   </supports>
 
   <releases>
-    <release version="v1.2" date="2024-10-1">
-      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.2</url>
+    <release version="v1.3" date="2024-10-6">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.3</url>
       <description translate="no">
-        <p>Preparing for Flathub release</p>
+        <p>Version 1.3</p>
         <ul>
-          <li>Non-user facing changes</li>
+          <li>Fixed inconsistent BMI message (underweight/healthy/overweight)</li>
+          <li>Updated app icon to fit the guidelines</li>
+          <li>Updated brand colour to fit the guidelines</li>
+          <li>Added hardware support info</li>
         </ul>
       </description>
     </release>
