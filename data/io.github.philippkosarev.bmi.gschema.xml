@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="bmi">
 	<schema id="io.github.philippkosarev.bmi" path="/io.github.philippkosarev.bmi/">
+	<key name="height" type="i">
+		<default>175</default>
+		<summary>Height in centimeters</summary>
+	</key>
+	<key name="weight" type="i">
+		<default>65</default>
+		<summary>Weight in kilograms</summary>
+	</key>
 	</schema>
 </schemalist>
