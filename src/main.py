@@ -33,18 +33,22 @@ class BmiApplication(Adw.Application):
     def __init__(self):
         super().__init__(application_id='io.github.philippkosarev.bmi',
                          flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
-        self.create_action('quit', lambda *_: self.quit(), ['<primary>q'])
-
+        self.create_action('quit', self.on_quit, ['<primary>q'])
+    
+    def on_quit(self, action, param):
+        self.win.on_close_window(widget="")
+        self.quit()
+    
     def do_activate(self):
         """Called when the application is activated.
 
         We raise the application's main window, creating it if
         necessary.
         """
-        win = self.props.active_window
-        if not win:
-            win = BmiWindow(application=self)
-        win.present()
+        self.win = self.props.active_window
+        if not self.win:
+            self.win = BmiWindow(application=self)
+        self.win.present()
 
     def create_action(self, name, callback, shortcuts=None):
         action = Gio.SimpleAction.new(name, None)

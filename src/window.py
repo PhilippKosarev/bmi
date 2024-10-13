@@ -18,9 +18,7 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
-from gi.repository import Adw
-from gi.repository import Gtk
-from gi.repository import Gdk
+from gi.repository import Adw, Gtk, Gdk, Gio
 
 class BmiWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'BmiWindow'
@@ -35,7 +33,11 @@ class BmiWindow(Adw.ApplicationWindow):
         self.set_title("BMI")
         self.set_default_size(0, 260)
         self.set_resizable(False)
-
+        
+        # Load GSettings and connect to the action after closing the app window
+        self.settings = Gio.Settings.new_with_path("io.github.philippkosarev.bmi", "/io.github.philippkosarev.bmi/")
+        self.connect("close-request", self.on_close_window)
+        
         # Window structure
         self.content = Adw.ToolbarView()
         self.set_content(self.content)
@@ -73,7 +75,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
         self.height_adjustment = Adw.SpinRow()
         self.height_adjustment.set_digits(1)
-        adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, page_increment=10, value=175)
+        adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, page_increment=10, value=self.settings["height"])
         self.height_adjustment.props.adjustment = adjustment
         self.height_adjustment.props.title = "CM"
         self.height_adjustment.connect('changed', self.on_value_changed)
@@ -81,7 +83,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
         self.weight_adjustment = Adw.SpinRow()
         self.weight_adjustment.set_digits(1)
-        adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=65)
+        adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["weight"])
         self.weight_adjustment.props.adjustment = adjustment
         self.weight_adjustment.props.title = "KG"
         self.weight_adjustment.connect('changed', self.on_value_changed)
@@ -121,7 +123,8 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_feedback_label.set_css_classes(["title-2", "success"])
         self.result_feedback_label.set_label("Healthy")
         self.right_box.append(self.result_feedback_label)
-
+    
+    # Action after clicking on the button that shows the BMI result
     def on_result_button_pressed(self, _button):
         clipboard = Gdk.Display.get_default().get_clipboard()
         Gdk.Clipboard.set(clipboard, self.bmi);
@@ -133,10 +136,8 @@ class BmiWindow(Adw.ApplicationWindow):
         self.bmi = self.height_adjustment.get_value() / 100 # converting cm to meters
         self.bmi = self.bmi ** 2
         self.bmi = self.weight_adjustment.get_value() / self.bmi
-        # self.bmi = "%.2f" % self.bmi # removing numbers after decimal point
-        # self.bmi = round(self.bmi, 5)
-
-
+    
+    # Action after changed values of self.height_adjustment and self.width_adjustment
     def on_value_changed(self, _scroll):
         self.calc_bmi()
         print(self.bmi)
@@ -164,7 +165,8 @@ class BmiWindow(Adw.ApplicationWindow):
             self.height_adjustment.set_title("Robert Wadlow")
         if self.weight_adjustment.get_value() == 650:
             self.weight_adjustment.set_title("Jon Brower Minnoch")
-
+    
+    # Show the About app dialog
     def show_about(self, _button):
         self.about = Adw.AboutWindow(application_name='BMI',
                                 application_icon='io.github.philippkosarev.bmi',
@@ -177,4 +179,8 @@ class BmiWindow(Adw.ApplicationWindow):
                                 website="https://github.com/philippkosarev/bmi",
                                 issue_url="https://github.com/philippkosarev/bmi/issues")
         self.about.present()
-
+        
+    # Action after closing the app window
+    def on_close_window(self, widget, *args):
+        self.settings["height"] = self.height_adjustment.get_value()
+        self.settings["weight"] = self.weight_adjustment.get_value()
