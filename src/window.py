@@ -28,7 +28,6 @@ class BmiWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-
         # Basic properties
         self.set_title("BMI")
         self.set_default_size(0, 260)
@@ -110,12 +109,9 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_label.set_label("BMI:")
         self.right_box.append(self.result_label)
 
-        self.calc_bmi()
-
         self.result_button = Gtk.Button(halign=Gtk.Align.CENTER)
         self.result_button.set_tooltip_text("Copy BMI")
         self.result_button.set_css_classes(["pill", "title-1"])
-        self.result_button.set_label(str(int(self.bmi)))
         self.result_button.connect('clicked', self.on_result_button_pressed)
         self.right_box.append(self.result_button)
 
@@ -123,6 +119,8 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_feedback_label.set_css_classes(["title-2", "success"])
         self.result_feedback_label.set_label("Healthy")
         self.right_box.append(self.result_feedback_label)
+
+        self.on_value_changed(self)
     
     # Action after clicking on the button that shows the BMI result
     def on_result_button_pressed(self, _button):
@@ -141,7 +139,6 @@ class BmiWindow(Adw.ApplicationWindow):
     def on_value_changed(self, _scroll):
         self.calc_bmi()
         print(self.bmi)
-
         self.result_button.set_label(str(int(self.bmi)))
         if self.bmi < 18:
             self.result_feedback_label.set_css_classes(["title-2", "accent"])
