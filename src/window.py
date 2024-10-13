@@ -123,9 +123,6 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_feedback_label.set_css_classes(["title-2", "success"])
         self.result_feedback_label.set_label("Healthy")
         self.right_box.append(self.result_feedback_label)
-        
-        # Load the BMI result after launching the app
-        self.on_value_changed(_scroll="")
     
     # Action after clicking on the button that shows the BMI result
     def on_result_button_pressed(self, _button):
