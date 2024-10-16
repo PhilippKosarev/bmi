@@ -28,15 +28,15 @@ class BmiWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        # Basic properties
-        self.set_title("BMI")
-        self.set_default_size(0, 260)
-        self.set_resizable(False)
-        
         # Load GSettings and connect to the action after closing the app window
         self.settings = Gio.Settings.new_with_path("io.github.philippkosarev.bmi", "/io.github.philippkosarev.bmi/")
         self.connect("close-request", self.on_close_window)
         
+        # Basic window properties
+        self.set_title("BMI")
+        self.set_default_size(0, 230)
+        self.set_resizable(False)
+
         # Window structure
         self.content = Adw.ToolbarView()
         self.set_content(self.content)
@@ -51,13 +51,20 @@ class BmiWindow(Adw.ApplicationWindow):
         self.about_button.connect('clicked', self.show_about)
         self.header.pack_start(self.about_button)
 
+        self.separator = Gtk.Separator()
+        self.header.pack_start(self.separator)
+
+        self.forget_button = Gtk.ToggleButton()
+        self.forget_button.set_icon_name("user-trash-full-symbolic")
+        self.forget_button.set_tooltip_text("Forget values on close")
+        self.header.pack_start(self.forget_button)
+
         # Main box
         self.drag = Gtk.WindowHandle()
         self.content.set_content(self.drag)
         self.toast_overlay = Adw.ToastOverlay()
         self.drag.set_child(self.toast_overlay)
-        self.main_box = Gtk.Box(valign=Gtk.Align.CENTER, spacing=20)
-        self.main_box.set_margin_bottom(28)
+        self.main_box = Gtk.Box(valign=Gtk.Align.START, spacing=12)
         self.main_box.set_margin_start(16)
         self.main_box.set_margin_end(30)
         self.toast_overlay.set_child(self.main_box)
@@ -73,27 +80,26 @@ class BmiWindow(Adw.ApplicationWindow):
         self.left_page.add(self.left_group)
 
         self.height_adjustment = Adw.SpinRow()
+        self.height_adjustment.set_title("CM")
         self.height_adjustment.set_digits(1)
         adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, page_increment=10, value=self.settings["height"])
-        self.height_adjustment.props.adjustment = adjustment
-        self.height_adjustment.props.title = "CM"
+        self.height_adjustment.set_adjustment(adjustment)
         self.height_adjustment.connect('changed', self.on_value_changed)
         self.left_group.add(self.height_adjustment)
 
         self.weight_adjustment = Adw.SpinRow()
+        self.weight_adjustment.set_title("KG")
         self.weight_adjustment.set_digits(1)
         adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["weight"])
-        self.weight_adjustment.props.adjustment = adjustment
-        self.weight_adjustment.props.title = "KG"
+        self.weight_adjustment.set_adjustment(adjustment)
         self.weight_adjustment.connect('changed', self.on_value_changed)
         self.left_group.add(self.weight_adjustment)
 
         # Icon
         self.center_box = Gtk.Box(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         self.main_box.append(self.center_box)
-
         self.icon = Gtk.Image()
-        self.icon.props.icon_name = "go-next-symbolic"
+        self.icon.set_from_icon_name("go-next-symbolic")
         self.icon.set_pixel_size(42)
         self.center_box.append(self.icon)
 
@@ -113,11 +119,10 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_button.set_tooltip_text("Copy BMI")
         self.result_button.set_css_classes(["pill", "title-1"])
         self.result_button.connect('clicked', self.on_result_button_pressed)
+        self.result_button.set_size_request(100, 0)
         self.right_box.append(self.result_button)
 
         self.result_feedback_label = Gtk.Label()
-        self.result_feedback_label.set_css_classes(["title-2", "success"])
-        self.result_feedback_label.set_label("Healthy")
         self.right_box.append(self.result_feedback_label)
 
         self.on_value_changed(self)
@@ -128,6 +133,7 @@ class BmiWindow(Adw.ApplicationWindow):
         Gdk.Clipboard.set(clipboard, self.bmi);
         self.toast = Adw.Toast()
         self.toast.set_title("Result copied")
+        self.toast.set_timeout(1)
         self.toast_overlay.add_toast(self.toast)
 
     def calc_bmi(self):
@@ -179,5 +185,10 @@ class BmiWindow(Adw.ApplicationWindow):
         
     # Action after closing the app window
     def on_close_window(self, widget, *args):
-        self.settings["height"] = self.height_adjustment.get_value()
-        self.settings["weight"] = self.weight_adjustment.get_value()
+        self.settings["forget"] = self.forget_button.get_active()
+        if self.forget_button.get_active() == True:
+            self.settings["height"] = 175
+            self.settings["weight"] = 65
+        else:
+            self.settings["height"] = self.height_adjustment.get_value()
+            self.settings["weight"] = self.weight_adjustment.get_value()
