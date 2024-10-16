@@ -48,11 +48,11 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/0a37115b4cff898ec0a6c54ae5f50ae544816942/screenshot.png</image>
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/7a098ecc8cf6474713b2a8c1b2114470d655e78b/screenshot.png</image>
       <caption>BMI Dark Theme</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/f598ae6986848a910b1497c1d0c7ff5272f11c76/screenshot2.png</image>
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/7a098ecc8cf6474713b2a8c1b2114470d655e78b/screenshot2.png</image>
       <caption>BMI Light Theme</caption>
     </screenshot>
   </screenshots>
@@ -69,15 +69,15 @@
   </supports>
 
   <releases>
-    <release version="v1.3" date="2024-10-6">
-      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.3</url>
+    <release version="v1.4" date="2024-10-6">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.4</url>
       <description translate="no">
-        <p>Version 1.3</p>
+        <p>Version 1.4</p>
         <ul>
-          <li>Fixed inconsistent BMI message (underweight/healthy/overweight)</li>
-          <li>Updated app icon to fit the guidelines</li>
-          <li>Updated brand colour to fit the guidelines</li>
-          <li>Added hardware support info</li>
+          <li>Added option to remember height and weight</li>
+          <li>"Copied results" toasts disappear quicker</li>
+          <li>BMI button now stays the same size regardless of the number inside</li>
+          <li>Made the window is smaller</li>
         </ul>
       </description>
     </release>

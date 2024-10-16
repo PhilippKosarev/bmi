@@ -57,6 +57,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.forget_button = Gtk.ToggleButton()
         self.forget_button.set_icon_name("user-trash-full-symbolic")
         self.forget_button.set_tooltip_text("Forget values on close")
+        self.forget_button.set_active(self.settings["forget"])
         self.header.pack_start(self.forget_button)
 
         # Main box
@@ -174,7 +175,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.about = Adw.AboutWindow(application_name='BMI',
                                 application_icon='io.github.philippkosarev.bmi',
                                 developer_name='Philipp Kosarev',
-                                version='v1.3',
+                                version='v1.4',
                                 developers=['Philipp Kosarev'],
                                 artists=['Philipp Kosarev'],
                                 copyright='© 2024 Philipp Kosarev',
@@ -185,10 +186,10 @@ class BmiWindow(Adw.ApplicationWindow):
         
     # Action after closing the app window
     def on_close_window(self, widget, *args):
-        self.settings["forget"] = self.forget_button.get_active()
         if self.forget_button.get_active() == True:
             self.settings["height"] = 175
             self.settings["weight"] = 65
         else:
             self.settings["height"] = self.height_adjustment.get_value()
             self.settings["weight"] = self.weight_adjustment.get_value()
+        self.settings["forget"] = self.forget_button.get_active()
