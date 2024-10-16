@@ -1,4 +1,3 @@
-![Icon](data/icons/hicolor/scalable/apps/io.github.philippkosarev.bmi.svg)
 # BMI
 BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita.
 ![Screenshot](screenshot.png)
