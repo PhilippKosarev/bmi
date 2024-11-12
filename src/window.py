@@ -19,12 +19,10 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 from gi.repository import Adw, Gtk, Gdk, Gio
+import math
 
 class BmiWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'BmiWindow'
-
-    label = Gtk.Template.Child()
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -46,13 +44,23 @@ class BmiWindow(Adw.ApplicationWindow):
         self.content.add_top_bar(self.header)
 
         self.about_button = Gtk.Button()
+        self.about_button.add_css_class("circular")
         self.about_button.set_tooltip_text("Show About")
         self.about_button.set_icon_name("help-about-symbolic")
         self.about_button.connect('clicked', self.show_about)
-        self.header.pack_start(self.about_button)
+        self.header.pack_end(self.about_button)
 
-        self.separator = Gtk.Separator()
-        self.header.pack_start(self.separator)
+        self.mode_dropdown = Gtk.DropDown()
+        modes_list = Gtk.StringList()
+        modes = ["Simple", "Advanced"]
+        for mode in modes:
+            modes_list.append(mode)
+        self.mode_dropdown.set_model(modes_list)
+        self.mode_dropdown.connect('notify::selected-item', self.on_dropdown_value_changed)
+        self.mode_dropdown.get_first_child().set_css_classes(["flat"])
+        self.mode_dropdown.set_selected(self.settings["mode"])
+        self.mode_dropdown.set_size_request(115, 0)
+        self.header.pack_start(self.mode_dropdown)
 
         self.forget_button = Gtk.ToggleButton()
         self.forget_button.set_icon_name("user-trash-full-symbolic")
@@ -67,36 +75,57 @@ class BmiWindow(Adw.ApplicationWindow):
         self.drag.set_child(self.toast_overlay)
         self.main_box = Gtk.Box(valign=Gtk.Align.START, spacing=12)
         self.main_box.set_margin_start(16)
-        self.main_box.set_margin_end(30)
+        self.main_box.set_margin_end(16)
         self.toast_overlay.set_child(self.main_box)
 
         # User inputs
-        self.left_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.CENTER)
-        self.left_page.set_hexpand(True)
-        self.left_page.set_vexpand(True)
-        self.left_page.set_size_request(270, 0)
-        self.main_box.append(self.left_page)
+        self.inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.inputs_page.set_hexpand(True)
+        self.inputs_page.set_vexpand(True)
+        self.inputs_page.set_size_request(270, 0)
+        self.main_box.append(self.inputs_page)
 
-        self.left_group = Adw.PreferencesGroup()
-        self.left_page.add(self.left_group)
+        self.inputs_group = Adw.PreferencesGroup(title="Inputs")
+        self.inputs_page.add(self.inputs_group)
 
-        self.height_adjustment = Adw.SpinRow()
-        self.height_adjustment.set_title("CM")
-        self.height_adjustment.set_digits(1)
-        adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, page_increment=10, value=self.settings["height"])
-        self.height_adjustment.set_adjustment(adjustment)
-        self.height_adjustment.connect('changed', self.on_value_changed)
-        self.left_group.add(self.height_adjustment)
+        self.adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, page_increment=10, value=self.settings["height"])
+        self.create_input_row("height_adjustment", "Height", self.adjustment, "Height in centimetres", False)
 
-        self.weight_adjustment = Adw.SpinRow()
-        self.weight_adjustment.set_title("KG")
-        self.weight_adjustment.set_digits(1)
-        adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["weight"])
-        self.weight_adjustment.set_adjustment(adjustment)
-        self.weight_adjustment.connect('changed', self.on_value_changed)
-        self.left_group.add(self.weight_adjustment)
+        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["weight"])
+        self.create_input_row("weight_adjustment", "Waist", self.adjustment, "Weight in kilograms", False)
 
-        # Icon
+        # Advanced user inputs
+        self.advanced_inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.advanced_inputs_page.set_hexpand(True)
+        self.advanced_inputs_page.set_vexpand(True)
+        self.advanced_inputs_page.set_size_request(270, 0)
+        self.main_box.append(self.advanced_inputs_page)
+
+        self.advanced_inputs_group = Adw.PreferencesGroup(title="Advanced inputs")
+        self.advanced_inputs_page.add(self.advanced_inputs_group)
+
+        self.gender_adjustment = Adw.ComboRow(title="Gender")
+        self.gender_adjustment.connect('notify::selected-item', self.on_dropdown_value_changed)
+        self.gender_adjustment.set_tooltip_text("Changes thresholds for healthy/unhealthy")
+        gender_list = Gtk.StringList()
+        self.gender_adjustment.set_model(gender_list)
+        genders = ["Average", "Female", "Male"]
+        for gender in genders:
+            gender_list.append(gender)
+        self.gender_adjustment.set_selected(self.settings["gender"])
+        self.advanced_inputs_group.add(self.gender_adjustment)
+
+        self.adjustment = Gtk.Adjustment(lower= 1, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
+        self.create_input_row("age_adjustment", "Age", self.adjustment, "Changes thresholds for healthy/unhealthy", True)
+        self.age_adjustment.set_digits(0)
+
+        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["waist"])
+        self.create_input_row("waist_adjustment", "Waist", self.adjustment, "Waist circumference in centimeters", True)
+
+        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["hip"])
+        self.create_input_row("hip_adjustment", "Hip", self.adjustment, "Hip circumference in centimeters", True)
+
+        # Arrow icon
         self.center_box = Gtk.Box(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
         self.main_box.append(self.center_box)
         self.icon = Gtk.Image()
@@ -104,72 +133,227 @@ class BmiWindow(Adw.ApplicationWindow):
         self.icon.set_pixel_size(42)
         self.center_box.append(self.icon)
 
-        # Results
+        # Simple results
         self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=6)
         self.right_box.set_hexpand(True)
         self.right_box.set_vexpand(True)
         self.right_box.set_size_request(175, 0)
+        self.right_box.set_margin_end(16)
         self.main_box.append(self.right_box)
 
         self.result_label = Gtk.Label()
-        self.result_label.set_css_classes(["title-2"])
+        self.result_label.add_css_class("title-2")
         self.result_label.set_label("BMI:")
         self.right_box.append(self.result_label)
 
-        self.result_button = Gtk.Button(halign=Gtk.Align.CENTER)
-        self.result_button.set_tooltip_text("Copy BMI")
-        self.result_button.set_css_classes(["pill", "title-1"])
-        self.result_button.connect('clicked', self.on_result_button_pressed)
-        self.result_button.set_size_request(100, 0)
-        self.right_box.append(self.result_button)
+        self.bmi_button = Gtk.Button(halign=Gtk.Align.CENTER)
+        self.bmi_button.set_tooltip_text("Copy BMI")
+        self.bmi_button.set_css_classes(["pill", "title-1"])
+        self.bmi_button.connect('clicked', self.clipboard_copy)
+        self.bmi_button.set_size_request(100, 0)
+        self.right_box.append(self.bmi_button)
 
         self.result_feedback_label = Gtk.Label()
+        self.result_feedback_label.add_css_class("title-2")
         self.right_box.append(self.result_feedback_label)
 
+        # Advanced results
+        self.right_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.right_page.set_hexpand(True)
+        self.right_page.set_vexpand(True)
+        self.right_page.set_size_request(270, 0)
+        self.main_box.append(self.right_page)
+
+        self.right_group = Adw.PreferencesGroup(title="Results")
+        self.right_page.add(self.right_group)
+
+        self.create_result_row("result_bmi_row", "BMI", "Body Mass Index")
+        self.create_result_row("result_waist_to_height_row", "Waist / Height", "Waist to height ratio")
+        self.create_result_row("result_waist_to_hip_row", "Waist / Hip", "Waist to hip ratio")
+        self.create_result_row("result_bri_row", "BRI", "Body Roundness Index")
+
+        # Updating values before launch
         self.on_value_changed(self)
+
+    # Creates a spin row and adds it to self.inputs_group
+    def create_input_row(self, widgetName, title, adjustment, tooltip, advanced):
+        setattr(self, widgetName, Adw.SpinRow())
+        self.widget = getattr(self, widgetName)
+
+        self.widget.set_title(title)
+        self.widget.set_tooltip_text(tooltip)
+        self.widget.set_digits(1)
+        self.widget.set_adjustment(adjustment)
+        self.widget.add_css_class("monospace")
+        self.widget.connect('changed', self.on_value_changed)
+        if advanced == True:
+            self.advanced_inputs_group.add(self.widget)
+        else:
+            self.inputs_group.add(self.widget)
+
+    # Creates an action row with a label and adds it to self.right_group
+    def create_result_row(self, widgetName, title, tooltip):
+        setattr(self, widgetName, Adw.ActionRow())
+        setattr(self, f"{widgetName}_label", Gtk.Label())
+        self.widget = getattr(self, widgetName)
+        self.label = getattr(self, f"{widgetName}_label")
     
-    # Action after clicking on the button that shows the BMI result
-    def on_result_button_pressed(self, _button):
+        self.widget.set_activatable(True)
+        self.widget.set_title(title)
+        self.widget.connect("activated", self.clipboard_copy)
+        self.widget.set_tooltip_text(tooltip)
+        self.widget.add_css_class("heading")
+        self.widget.add_css_class("monospace")
+        self.label.set_css_classes(["title-3"])
+        self.label.set_label("21")
+        self.widget.add_suffix(self.label)
+        self.right_group.add(self.widget)
+
+    def clipboard_copy(self, widget):
+        if widget.get_name() == "AdwActionRow":
+            # Hackiest way ever, but it works 🤷
+            # Explanation: AdwActionRow has box inside a box of which the 4th child is the "suffixes", inside it we have our result label
+            value = widget.get_first_child().get_first_child().get_next_sibling().get_next_sibling().get_next_sibling().get_first_child().get_label()
+        if widget.get_name() == "GtkButton":
+            value = widget.get_label();
+        print(f"Copied: {value}")
+        value = str(value) # Gdk Clipboard only accepts strings
         clipboard = Gdk.Display.get_default().get_clipboard()
-        Gdk.Clipboard.set(clipboard, self.bmi);
+        Gdk.Clipboard.set(clipboard, value);
         self.toast = Adw.Toast()
         self.toast.set_title("Result copied")
         self.toast.set_timeout(1)
         self.toast_overlay.add_toast(self.toast)
 
-    def calc_bmi(self):
-        self.bmi = self.height_adjustment.get_value() / 100 # converting cm to meters
-        self.bmi = self.bmi ** 2
-        self.bmi = self.weight_adjustment.get_value() / self.bmi
-    
+    def calculate(self, param):
+        if param == "bmi":
+            self.value = self.height_adjustment.get_value() / 100 # converting cm to meters
+            self.value = self.value ** 2
+            self.value = self.weight_adjustment.get_value() / self.value
+            # print("BMI: ", self.value) # For debugging
+            return self.value
+        elif param == "waist_to_height":
+            self.value = self.waist_adjustment.get_value() / self.height_adjustment.get_value()
+            # print("Waist to height Ratio: ", self.value) # For debugging
+            return self.value
+        elif param == "waist_to_hip":
+            self.value = self.waist_adjustment.get_value() / self.hip_adjustment.get_value()
+            # print("Waist to hip Ratio: ", self.value) # For debugging
+            return self.value
+        elif param == "bri":
+            self.value = (self.waist_adjustment.get_value() / (math.pi*2))**2
+            self.value = self.value / ((self.height_adjustment.get_value() / 2)**2)
+            self.value = 364.2 - 365.5 * math.sqrt(1 - self.value)
+            # print("BRI: ", self.value) # For debugging
+            return self.value
+
+    # just calls on_value_changed when a different mode is selected
+    def on_dropdown_value_changed(self, dropdown, _pspec):
+        self.on_value_changed(self)
+
     # Action after changed values of self.height_adjustment and self.width_adjustment
     def on_value_changed(self, _scroll):
-        self.calc_bmi()
-        print(self.bmi)
-        self.result_button.set_label(str(int(self.bmi)))
-        if self.bmi < 18:
-            self.result_feedback_label.set_css_classes(["title-2", "accent"])
-            self.result_feedback_label.set_label("Underweight")
-        if self.bmi >= 18:
-            self.result_feedback_label.set_css_classes(["title-2", "success"])
-            self.result_feedback_label.set_label("Healthy")
-        if self.bmi >= 25:
-            self.result_feedback_label.set_css_classes(["title-2", "warning"])
-            self.result_feedback_label.set_label("Overweight")
-        if self.bmi >= 30:
-            self.result_feedback_label.set_css_classes(["title-2", "error"])
-            self.result_feedback_label.set_label("Obese")
-        if self.bmi >= 40:
-            self.result_feedback_label.set_css_classes(["title-2"])
-            self.result_feedback_label.set_label("Extremely obese")
+        self.update_results()
+        if self.mode_dropdown.get_selected_item().get_string() == "Simple":
+            self.advanced_inputs_page.set_visible(False)
+            self.right_page.set_visible(False)
+            self.right_box.set_visible(True)
+            self.inputs_group.set_title("")
 
-        self.height_adjustment.set_title("CM")
-        self.weight_adjustment.set_title("KG")
+            self.inputs_page.set_size_request(270, 0)
+        else:
+            self.advanced_inputs_page.set_visible(True)
+
+            self.right_page.set_visible(True)
+            self.right_box.set_visible(False)
+            self.inputs_group.set_title("Inputs")
+
+            self.inputs_page.set_size_request(270, 320)
+
+    def set_result(self, widget, value, over, css_class, label):
+        if value >= over:
+            widget.remove_css_class("accent")
+            widget.remove_css_class("success")
+            widget.remove_css_class("warning")
+            widget.remove_css_class("error")
+            if widget.get_name() == "GtkLabel":
+                widget.set_label(label)
+                widget.add_css_class(css_class)
+            if widget.get_name() == "AdwActionRow":
+                widget.set_subtitle(label)
+                widget.add_css_class(css_class)
+
+    def update_results(self):
+        self.age = self.age_adjustment.get_value()
+        self.gender = self.gender_adjustment.get_selected_item().get_string()
+
+        # Thresholds table (works by principle "if more than or equal to")
+        bmi_healthy = 18.5
+        bmi_overweight = 25
+        bmi_obese = 30
+        bmi_extremely_obese = 40
+
+        self.waist_to_height_unhealthy = 0.5
+        if self.age > 40:
+            self.waist_to_height_unhealthy = ((self.age-40)/100)+0.5
+        if self.age > 50:
+            self.waist_to_height_unhealthy = 0.6
+
+        self.waist_to_hip_overweight = 0.85
+        self.waist_to_hip_obese = 0.925
+        if self.gender == "Female":
+            self.waist_to_hip_overweight = 0.8
+            self.waist_to_hip_obese = 0.85
+        if self.gender == "Male":
+            self.waist_to_hip_overweight = 0.9
+            self.waist_to_hip_obese = 1
+
+        # Updating bmi
+        self.bmi = self.calculate("bmi")
+        self.bmi_button.set_label(str(int(self.bmi)))
+        self.result_bmi_row_label.set_label(str(round(self.bmi, 1)))
+
+        self.set_result(self.result_bmi_row, self.bmi, 0, "accent", "Underweight")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_healthy, "success", "Healthy")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_overweight, "warning", "Overweight")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_obese, "error", "Obese")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_extremely_obese, "", "Extremely obese")
+
+        self.set_result(self.result_feedback_label, self.bmi, 0, "accent", "Underweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_healthy, "success", "Healthy")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_overweight, "warning", "Overweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_obese, "error", "Obese")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_extremely_obese, "", "Extremely obese")
+
+        self.height_adjustment.set_title("Height")
+        self.weight_adjustment.set_title("Weight")
         if self.height_adjustment.get_value() == 267:
             self.height_adjustment.set_title("Robert Wadlow")
         if self.weight_adjustment.get_value() == 650:
             self.weight_adjustment.set_title("Jon Brower Minnoch")
-    
+
+        # Updating waist to height ratio
+        self.waist_to_height = self.calculate("waist_to_height")
+        self.result_waist_to_height_row_label.set_label(str(round(self.waist_to_height, 2)))
+        self.set_result(self.result_waist_to_height_row, self.waist_to_height, 0, "success", "Healthy")
+        self.set_result(self.result_waist_to_height_row, self.waist_to_height, self.waist_to_height_unhealthy, "warning", "Unhealthy")
+
+        # Updating waist to hip ratio
+        self.waist_to_hip = self.calculate("waist_to_hip")
+        self.result_waist_to_hip_row_label.set_label(str(round(self.waist_to_hip, 2)))
+        self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, 0, "success", "Healthy")
+        self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, self.waist_to_hip_overweight, "warning", "Overweight")
+        self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, self.waist_to_hip_obese, "error", "Obese")
+
+        # Updating BRI
+        self.bri = self.calculate("bri")
+        self.result_bri_row_label.set_label(str(round(self.bri, 2)))
+        self.set_result(self.result_bri_row, self.bri, 0, "accent", "Very lean")
+        self.set_result(self.result_bri_row, self.bri, 3.41, "success", "Healthy")
+        self.set_result(self.result_bri_row, self.bri, 4.45, "warning", "Overweight")
+        self.set_result(self.result_bri_row, self.bri, 5.46, "warning", "Obese")
+        self.set_result(self.result_bri_row, self.bri, 6.91, "", "Extremely obese")
+
     # Show the About app dialog
     def show_about(self, _button):
         self.about = Adw.AboutWindow(application_name='BMI',
@@ -186,10 +370,24 @@ class BmiWindow(Adw.ApplicationWindow):
         
     # Action after closing the app window
     def on_close_window(self, widget, *args):
-        if self.forget_button.get_active() == True:
-            self.settings["height"] = 175
-            self.settings["weight"] = 65
-        else:
-            self.settings["height"] = self.height_adjustment.get_value()
-            self.settings["weight"] = self.weight_adjustment.get_value()
+        self.settings["height"] = self.height_adjustment.get_value()
+        self.settings["weight"] = self.weight_adjustment.get_value()
+        self.settings["gender"] = self.gender_adjustment.get_selected()
+        self.settings["age"] = self.age_adjustment.get_value()
+        self.settings["waist"] = self.weight_adjustment.get_value()
+        self.settings["hip"] = self.weight_adjustment.get_value()
         self.settings["forget"] = self.forget_button.get_active()
+
+        if self.mode_dropdown.get_selected_item().get_string() == "Advanced":
+            self.settings["mode"] = 1
+        else:
+            self.settings["mode"] = 0
+
+        if self.forget_button.get_active() == True:
+            self.settings.reset("height")
+            self.settings.reset("weight")
+            self.settings.reset("gender")
+            self.settings.reset("age")
+            self.settings.reset("waist")
+            self.settings.reset("hip")
+            print("Input values were reset")
