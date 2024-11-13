@@ -26,11 +26,11 @@
 		  <summary>Biological gender</summary>
 	  </key>
 	  <key name="waist" type="i">
-		  <default>80</default>
+		  <default>70</default>
 		  <summary>Waist circumference in centimeters</summary>
 	  </key>
 	  <key name="hip" type="i">
-		  <default>90</default>
+		  <default>85</default>
 		  <summary>Hip circumference in centimeters</summary>
 	  </key>
 	</schema>
