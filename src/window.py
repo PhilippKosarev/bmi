@@ -105,7 +105,6 @@ class BmiWindow(Adw.ApplicationWindow):
         self.advanced_inputs_page.add(self.advanced_inputs_group)
 
         self.gender_adjustment = Adw.ComboRow(title="Gender")
-        self.gender_adjustment.add_css_class("monospace")
         self.gender_adjustment.connect('notify::selected-item', self.on_dropdown_value_changed)
         self.gender_adjustment.set_tooltip_text("Affects healthy/unhealthy thresholds for Waist to Hip ratio")
         gender_list = Gtk.StringList()
@@ -187,7 +186,6 @@ class BmiWindow(Adw.ApplicationWindow):
         self.widget.set_tooltip_text(tooltip)
         self.widget.set_digits(1)
         self.widget.set_adjustment(adjustment)
-        self.widget.add_css_class("monospace")
         self.widget.connect('changed', self.on_value_changed)
         if advanced == True:
             self.advanced_inputs_group.add(self.widget)
@@ -376,20 +374,18 @@ class BmiWindow(Adw.ApplicationWindow):
     def on_close_window(self, widget, *args):
         self.settings["height"] = self.height_adjustment.get_value()
         self.settings["weight"] = self.weight_adjustment.get_value()
+
+        self.settings["mode"] = self.mode_dropdown.get_selected()
         self.settings["gender"] = self.gender_adjustment.get_selected()
         self.settings["age"] = self.age_adjustment.get_value()
         self.settings["waist"] = self.weight_adjustment.get_value()
         self.settings["hip"] = self.weight_adjustment.get_value()
         self.settings["forget"] = self.forget_button.get_active()
 
-        if self.mode_dropdown.get_selected_item().get_string() == "Advanced":
-            self.settings["mode"] = 1
-        else:
-            self.settings["mode"] = 0
-
         if self.forget_button.get_active() == True:
             self.settings.reset("height")
             self.settings.reset("weight")
+
             self.settings.reset("gender")
             self.settings.reset("age")
             self.settings.reset("waist")
