@@ -117,7 +117,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.gender_adjustment.set_selected(self.settings["gender"])
         self.advanced_inputs_group.add(self.gender_adjustment)
 
-        self.adjustment = Gtk.Adjustment(lower= 18, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
+        self.adjustment = Gtk.Adjustment(lower= 5, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
         self.create_input_row("age_adjustment", "Age", self.adjustment, "Affects healthy/unhealthy thresholds for Waist to Height ratio", True)
         self.age_adjustment.set_digits(0)
 
@@ -270,6 +270,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.gender = self.gender_adjustment.get_selected_item().get_string()
 
         # Thresholds table (works by the principle "equal or more than")
+        bmi_underweight = 0
         bmi_underweight3 = 0
         bmi_underweight2 = 16
         bmi_underweight1 = 17
@@ -278,6 +279,7 @@ class BmiWindow(Adw.ApplicationWindow):
         bmi_obese1 = 30
         bmi_obese2 = 35
         bmi_obese3 = 40
+        bmi_obese = 40
 
         self.waist_to_height_unhealthy = 0.5
         if self.age > 40:
@@ -305,14 +307,23 @@ class BmiWindow(Adw.ApplicationWindow):
         # using that to calculate the bmi threshold, but unsuccessful so far
         # which is why the age_adjustment's lower boundary is 18
         # if self.gender == "Female" and self.age < 20:
-        #     curve = self.age
-        #     curve = (curve-5)/(19-5) # normalizing
-        #     curve = curve*2 # making the range -1 to 1 instead of 0 to 1
-        #     curve = curve-1
-        #     curve = math.sin(curve)
-        #     curve = curve + 1 # making the number positive
-        #     bmi_overweight = curve
-        #     print(round(curve, 2))
+        #     age_curve = self.age
+        #     age_curve = (age_curve-5)/(19-5) # normalizing
+        #     age_curve = math.sin(age_curve * math.pi - math.pi / 2) # sine waving
+        #     age_curve = (age_curve + 1)/2 # normalizing again
+
+            # Underweight
+        #     bmi_underweight = age_curve * (17.2 - 13.1)
+        #     bmi_underweight = bmi_underweight + 13.1
+        #     print(round(bmi_underweight, 2))
+
+            # Underweight
+        #     bmi_healthy = age_curve * (17.2 - 13.1)
+        #     bmi_healthy = bmi_healthy + 13.1
+
+            # Overweight
+        #     bmi_overweight = age_curve * (25.1 - 16.9)
+        #     bmi_overweight = bmi_overweight + 16.9
 
         self.set_result(self.result_bmi_row, self.bmi, bmi_underweight3, "accent", "Underweight [Severe]")
         self.set_result(self.result_bmi_row, self.bmi, bmi_underweight2, "accent", "Underweight [Moderate]")
