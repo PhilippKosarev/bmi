@@ -69,15 +69,13 @@
   </supports>
 
   <releases>
-    <release version="v1.4" date="2024-10-6">
-      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v1.4</url>
+    <release version="v2.0" date="2024-11-17">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v2.0</url>
       <description translate="no">
-        <p>Version 1.4</p>
+        <p>Version 2.0</p>
         <ul>
-          <li>Added option to remember height and weight</li>
-          <li>"Copied results" toasts disappear quicker</li>
-          <li>BMI button now stays the same size regardless of the number inside</li>
-          <li>Made the window is smaller</li>
+          <li>Added advanced mode</li>
+          <li>Added symbolic icon</li>
         </ul>
       </description>
     </release>

@@ -44,12 +44,14 @@ class BmiWindow(Adw.ApplicationWindow):
         self.header = Adw.HeaderBar()
         self.content.add_top_bar(self.header)
 
+        # About button
         self.about_button = Gtk.Button()
         self.about_button.set_tooltip_text("Show About")
         self.about_button.set_icon_name("help-about-symbolic")
         self.about_button.connect('clicked', self.show_about)
         self.header.pack_end(self.about_button)
 
+        # Mode dropdown
         self.mode_dropdown = Gtk.DropDown()
         modes_list = Gtk.StringList()
         modes = ["BMI (Basic)", "BMI (Advanced)"]
@@ -59,9 +61,9 @@ class BmiWindow(Adw.ApplicationWindow):
         self.mode_dropdown.connect('notify::selected-item', self.on_dropdown_value_changed)
         self.mode_dropdown.get_first_child().set_css_classes(["flat"])
         self.mode_dropdown.set_selected(self.settings["mode"])
-        # self.header.pack_start(self.mode_dropdown)
         self.header.set_title_widget(self.mode_dropdown)
 
+        # Forget button
         self.forget_button = Gtk.ToggleButton()
         self.forget_button.set_icon_name("user-trash-full-symbolic")
         self.forget_button.set_tooltip_text("Forget values on close")
@@ -126,12 +128,10 @@ class BmiWindow(Adw.ApplicationWindow):
         self.create_input_row("hip_adjustment", "Hip", self.adjustment, "Hip circumference in centimeters", True)
 
         # Arrow icon
-        self.center_box = Gtk.Box(halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER)
-        self.main_box.append(self.center_box)
         self.icon = Gtk.Image()
         self.icon.set_from_icon_name("go-next-symbolic")
         self.icon.set_pixel_size(42)
-        self.center_box.append(self.icon)
+        self.main_box.append(self.icon)
 
         # Simple results
         self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=6)
@@ -366,7 +366,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.about = Adw.AboutWindow(application_name='BMI',
         application_icon='io.github.philippkosarev.bmi',
         developer_name='Philipp Kosarev',
-        version='v1.4',
+        version='v2.0',
         developers=['Philipp Kosarev'],
         artists=['Philipp Kosarev'],
         copyright='© 2024 Philipp Kosarev',
