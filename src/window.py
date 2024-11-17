@@ -98,7 +98,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.advanced_inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
         self.advanced_inputs_page.set_hexpand(True)
         self.advanced_inputs_page.set_vexpand(True)
-        self.advanced_inputs_page.set_size_request(270, 0)
+        self.advanced_inputs_page.set_size_request(290, 320)
         self.main_box.append(self.advanced_inputs_page)
 
         self.advanced_inputs_group = Adw.PreferencesGroup(title="Advanced inputs")
@@ -115,14 +115,14 @@ class BmiWindow(Adw.ApplicationWindow):
         self.gender_adjustment.set_selected(self.settings["gender"])
         self.advanced_inputs_group.add(self.gender_adjustment)
 
-        self.adjustment = Gtk.Adjustment(lower= 2, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
+        self.adjustment = Gtk.Adjustment(lower= 18, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
         self.create_input_row("age_adjustment", "Age", self.adjustment, "Affects healthy/unhealthy thresholds for Waist to Height ratio", True)
         self.age_adjustment.set_digits(0)
 
-        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["waist"])
+        self.adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10, value=self.settings["waist"])
         self.create_input_row("waist_adjustment", "Waist", self.adjustment, "Waist circumference in centimeters", True)
 
-        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["hip"])
+        self.adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10, value=self.settings["hip"])
         self.create_input_row("hip_adjustment", "Hip", self.adjustment, "Hip circumference in centimeters", True)
 
         # Arrow icon
@@ -159,9 +159,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
         # Advanced results
         self.right_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
-        self.right_page.set_hexpand(True)
-        self.right_page.set_vexpand(True)
-        self.right_page.set_size_request(270, 0)
+        self.right_page.set_size_request(290, 0)
         self.main_box.append(self.right_page)
 
         self.right_group = Adw.PreferencesGroup(title="Results")
@@ -172,10 +170,10 @@ class BmiWindow(Adw.ApplicationWindow):
         self.create_result_row("result_waist_to_hip_row", "Waist / Hip", "Waist to hip ratio")
         self.create_result_row("result_bri_row", "BRI", "Body Roundness Index")
 
+        # Hiding/showing advanced inputs/results & updating values before showing the window
         self.init_finished = True
-
-        # Updating values before launch
-        self.on_value_changed(self)
+        self.update_mode()
+        self.update_results()
 
     # Creates a spin row and adds it to self.inputs_group
     def create_input_row(self, widgetName, title, adjustment, tooltip, advanced):
@@ -225,53 +223,30 @@ class BmiWindow(Adw.ApplicationWindow):
         self.toast.set_timeout(1)
         self.toast_overlay.add_toast(self.toast)
 
-    def calculate(self, param):
-        if param == "bmi":
-            self.value = self.height_adjustment.get_value() / 100 # converting cm to meters
-            self.value = self.value ** 2
-            self.value = self.weight_adjustment.get_value() / self.value
-            # print("BMI: ", self.value) # For debugging
-            return self.value
-        elif param == "waist_to_height":
-            self.value = self.waist_adjustment.get_value() / self.height_adjustment.get_value()
-            # print("Waist to height Ratio: ", self.value) # For debugging
-            return self.value
-        elif param == "waist_to_hip":
-            self.value = self.waist_adjustment.get_value() / self.hip_adjustment.get_value()
-            # print("Waist to hip Ratio: ", self.value) # For debugging
-            return self.value
-        elif param == "bri":
-            self.value = (self.waist_adjustment.get_value() / (math.pi*2))**2
-            self.value = self.value / ((self.height_adjustment.get_value() / 2)**2)
-            self.value = 364.2 - 365.5 * math.sqrt(1 - self.value)
-            # print("BRI: ", self.value) # For debugging
-            return self.value
-
-    # just calls on_value_changed when a different mode is selected
+    # Action, called after value of self.mode_dropdown changes
     def on_dropdown_value_changed(self, dropdown, _pspec):
-        self.on_value_changed(self)
+        self.update_mode()
 
-    # Action after changed values of self.height_adjustment and self.width_adjustment
+    # Action, called after value of self.height_adjustment or other adjustments changes
     def on_value_changed(self, _scroll):
+        self.update_results()
+
+    # Hides or shows simple and advanced input and output widgets depending on the selected mode
+    def update_mode(self):
         if self.init_finished == False:
             return
-        self.update_results()
         if self.mode_dropdown.get_selected() == 0:
             self.advanced_inputs_page.set_visible(False)
             self.right_page.set_visible(False)
             self.right_box.set_visible(True)
             self.inputs_group.set_title("")
-
-            self.inputs_page.set_size_request(270, 0)
         else:
             self.advanced_inputs_page.set_visible(True)
-
             self.right_page.set_visible(True)
             self.right_box.set_visible(False)
             self.inputs_group.set_title("Inputs")
 
-            self.inputs_page.set_size_request(270, 320)
-
+    # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
     def set_result(self, widget, value, over, css_class, label):
         if value >= over:
             widget.remove_css_class("accent")
@@ -286,14 +261,23 @@ class BmiWindow(Adw.ApplicationWindow):
                 widget.add_css_class(css_class)
 
     def update_results(self):
+        # Widgets call their action on creation so this prevents them from complaining
+        # when the action tries to do something with the widgets which have not been created yet
+        if self.init_finished == False:
+            return
+        # Getting adjustment values which determine some of the results' thresholds
         self.age = self.age_adjustment.get_value()
         self.gender = self.gender_adjustment.get_selected_item().get_string()
 
-        # Thresholds table (works by principle "if more than or equal to")
+        # Thresholds table (works by the principle "equal or more than")
+        bmi_underweight3 = 0
+        bmi_underweight2 = 16
+        bmi_underweight1 = 17
         bmi_healthy = 18.5
         bmi_overweight = 25
-        bmi_obese = 30
-        bmi_extremely_obese = 40
+        bmi_obese1 = 30
+        bmi_obese2 = 35
+        bmi_obese3 = 40
 
         self.waist_to_height_unhealthy = 0.5
         if self.age > 40:
@@ -311,21 +295,40 @@ class BmiWindow(Adw.ApplicationWindow):
             self.waist_to_hip_obese = 1
 
         # Updating bmi
-        self.bmi = self.calculate("bmi")
+        self.bmi = self.height_adjustment.get_value() / 100 # converting cm to meters
+        self.bmi = self.bmi ** 2
+        self.bmi = self.weight_adjustment.get_value() / self.bmi
         self.bmi_button.set_label(str(int(self.bmi)))
         self.result_bmi_row_label.set_label(str(round(self.bmi, 1)))
 
-        self.set_result(self.result_bmi_row, self.bmi, 0, "accent", "Underweight")
+        # The BMI thresholds for under 20s looks like a sine wave so I tried
+        # using that to calculate the bmi threshold, but unsuccessful so far
+        # which is why the age_adjustment's lower boundary is 18
+        # if self.gender == "Female" and self.age < 20:
+        #     curve = self.age
+        #     curve = (curve-5)/(19-5) # normalizing
+        #     curve = curve*2 # making the range -1 to 1 instead of 0 to 1
+        #     curve = curve-1
+        #     curve = math.sin(curve)
+        #     curve = curve + 1 # making the number positive
+        #     bmi_overweight = curve
+        #     print(round(curve, 2))
+
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight3, "accent", "Underweight [Severe]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight2, "accent", "Underweight [Moderate]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight1, "accent", "Underweight [Mild]")
         self.set_result(self.result_bmi_row, self.bmi, bmi_healthy, "success", "Healthy")
         self.set_result(self.result_bmi_row, self.bmi, bmi_overweight, "warning", "Overweight")
-        self.set_result(self.result_bmi_row, self.bmi, bmi_obese, "error", "Obese")
-        self.set_result(self.result_bmi_row, self.bmi, bmi_extremely_obese, "", "Extremely obese")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_obese1, "error", "Obese [Class 1]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_obese2, "error", "Obese [Class 2]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_obese3, "error", "Obese [Class 3]")
 
-        self.set_result(self.result_feedback_label, self.bmi, 0, "accent", "Underweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight3, "accent", "Underweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight1, "accent", "Underweight")
         self.set_result(self.result_feedback_label, self.bmi, bmi_healthy, "success", "Healthy")
         self.set_result(self.result_feedback_label, self.bmi, bmi_overweight, "warning", "Overweight")
-        self.set_result(self.result_feedback_label, self.bmi, bmi_obese, "error", "Obese")
-        self.set_result(self.result_feedback_label, self.bmi, bmi_extremely_obese, "", "Extremely obese")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_obese1, "error", "Obese")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_obese3, "error", "Extremely obese")
 
         self.height_adjustment.set_title("Height")
         self.weight_adjustment.set_title("Weight")
@@ -335,59 +338,60 @@ class BmiWindow(Adw.ApplicationWindow):
             self.weight_adjustment.set_title("Jon Brower Minnoch")
 
         # Updating waist to height ratio
-        self.waist_to_height = self.calculate("waist_to_height")
+        self.waist_to_height = self.waist_adjustment.get_value() / self.height_adjustment.get_value()
         self.result_waist_to_height_row_label.set_label(str(round(self.waist_to_height, 2)))
         self.set_result(self.result_waist_to_height_row, self.waist_to_height, 0, "success", "Healthy")
         self.set_result(self.result_waist_to_height_row, self.waist_to_height, self.waist_to_height_unhealthy, "warning", "Unhealthy")
 
         # Updating waist to hip ratio
-        self.waist_to_hip = self.calculate("waist_to_hip")
+        self.waist_to_hip = self.waist_adjustment.get_value() / self.hip_adjustment.get_value()
         self.result_waist_to_hip_row_label.set_label(str(round(self.waist_to_hip, 2)))
         self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, 0, "success", "Healthy")
         self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, self.waist_to_hip_overweight, "warning", "Overweight")
         self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, self.waist_to_hip_obese, "error", "Obese")
 
         # Updating BRI
-        self.bri = self.calculate("bri")
+        self.bri = (self.waist_adjustment.get_value() / (math.pi*2))**2
+        self.bri = self.bri / ((self.height_adjustment.get_value() / 2)**2)
+        self.bri = 364.2 - 365.5 * math.sqrt(1 - self.bri)
         self.result_bri_row_label.set_label(str(round(self.bri, 2)))
         self.set_result(self.result_bri_row, self.bri, 0, "accent", "Very lean")
         self.set_result(self.result_bri_row, self.bri, 3.41, "success", "Healthy")
         self.set_result(self.result_bri_row, self.bri, 4.45, "warning", "Overweight")
         self.set_result(self.result_bri_row, self.bri, 5.46, "warning", "Obese")
-        self.set_result(self.result_bri_row, self.bri, 6.91, "", "Extremely obese")
+        self.set_result(self.result_bri_row, self.bri, 6.91, "error", "Extremely obese")
 
     # Show the About app dialog
     def show_about(self, _button):
         self.about = Adw.AboutWindow(application_name='BMI',
-                                application_icon='io.github.philippkosarev.bmi',
-                                developer_name='Philipp Kosarev',
-                                version='v1.4',
-                                developers=['Philipp Kosarev'],
-                                artists=['Philipp Kosarev'],
-                                copyright='© 2024 Philipp Kosarev',
-                                license_type="GTK_LICENSE_GPL_2_0",
-                                website="https://github.com/philippkosarev/bmi",
-                                issue_url="https://github.com/philippkosarev/bmi/issues")
+        application_icon='io.github.philippkosarev.bmi',
+        developer_name='Philipp Kosarev',
+        version='v1.4',
+        developers=['Philipp Kosarev'],
+        artists=['Philipp Kosarev'],
+        copyright='© 2024 Philipp Kosarev',
+        license_type="GTK_LICENSE_GPL_2_0",
+        website="https://github.com/philippkosarev/bmi",
+        issue_url="https://github.com/philippkosarev/bmi/issues")
         self.about.present()
         
     # Action after closing the app window
     def on_close_window(self, widget, *args):
+        # Setting gsettings values to adjustments to use them on next launch
         self.settings["height"] = self.height_adjustment.get_value()
         self.settings["weight"] = self.weight_adjustment.get_value()
-
         self.settings["mode"] = self.mode_dropdown.get_selected()
         self.settings["gender"] = self.gender_adjustment.get_selected()
         self.settings["age"] = self.age_adjustment.get_value()
-        self.settings["waist"] = self.weight_adjustment.get_value()
-        self.settings["hip"] = self.weight_adjustment.get_value()
+        self.settings["waist"] = self.waist_adjustment.get_value()
+        self.settings["hip"] = self.hip_adjustment.get_value()
         self.settings["forget"] = self.forget_button.get_active()
 
+        # Resets adjustments if forget button is active
         if self.forget_button.get_active() == True:
             self.settings.reset("height")
             self.settings.reset("weight")
-
             self.settings.reset("gender")
             self.settings.reset("age")
             self.settings.reset("waist")
             self.settings.reset("hip")
-            print("Input values were reset")
