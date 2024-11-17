@@ -48,12 +48,20 @@
 
   <screenshots>
     <screenshot type="default">
-      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/7a098ecc8cf6474713b2a8c1b2114470d655e78b/screenshot.png</image>
-      <caption>BMI Dark Theme</caption>
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/46d5ab059ec5dcbf9295b4e17e96a2a544c7d0e6/screenshots/simple-dark.png</image>
+      <caption>BMI Basic Mode Dark Theme</caption>
     </screenshot>
     <screenshot>
-      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/7a098ecc8cf6474713b2a8c1b2114470d655e78b/screenshot2.png</image>
-      <caption>BMI Light Theme</caption>
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/46d5ab059ec5dcbf9295b4e17e96a2a544c7d0e6/screenshots/simple-light.png</image>
+      <caption>BMI Basic Mode Light Theme</caption>
+    </screenshot>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/46d5ab059ec5dcbf9295b4e17e96a2a544c7d0e6/screenshots/advanced-dark.png</image>
+      <caption>BMI Advanced Mode Dark Theme</caption>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/PhilippKosarev/bmi/46d5ab059ec5dcbf9295b4e17e96a2a544c7d0e6/screenshots/advanced-light.png</image>
+      <caption>BMI Advanced Mode Light Theme</caption>
     </screenshot>
   </screenshots>
 

@@ -1,6 +1,6 @@
 # BMI
 BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita.
-![Screenshot](screenshot.png)
+![Screenshot](screenshots/simple-dark.png)
 
 # Install
 <p><a href='https://flathub.org/apps/details/io.github.philippkosarev.bmi'><img width='150' alt='Download on Flathub' src='https://flathub.org/api/badge?locale=en'/></a></p>
