@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="bmi">
-	<schema id="io.github.philippkosarev.bmi" path="/io.github.philippkosarev.bmi/">
+	<schema id="io.github.philippkosarev.bmi" path="/io/github/philippkosarev/bmi/">
 	  <key name="forget" type="b">
 		  <default>false</default>
 		  <summary>Forget height and weight on quit</summary>

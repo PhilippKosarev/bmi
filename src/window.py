@@ -21,15 +21,20 @@
 from gi.repository import Adw, Gtk, Gdk, Gio
 import math
 
+app_id = "io.github.philippkosarev.bmi"
+
 class BmiWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'BmiWindow'
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.init_finished = False
 
-        # Initialising GSettings and connecting action after closing the app window
-        self.settings = Gio.Settings.new_with_path("io.github.philippkosarev.bmi", "/io.github.philippkosarev.bmi/")
+        # Loading GSettings and connecting action after closing the app window
+        self.settings = Gio.Settings.new_with_path(app_id, "/io/github/philippkosarev/bmi/")
         self.connect("close-request", self.on_close_window)
+        # Loading custom css
+        self.provider = Gtk.CssProvider();
+        self.provider.load_from_resource("style.css");
         
         # Basic window properties
         self.set_title("BMI")
@@ -67,21 +72,24 @@ class BmiWindow(Adw.ApplicationWindow):
         self.forget_button.set_active(self.settings["forget"])
         self.header.pack_start(self.forget_button)
 
-        # Main box
+        # WindowHandle to make the whole window draggable
         self.drag = Gtk.WindowHandle()
         self.content.set_content(self.drag)
+        # Toast overlay layer
         self.toast_overlay = Adw.ToastOverlay()
         self.drag.set_child(self.toast_overlay)
-        self.main_box = Gtk.Box(valign=Gtk.Align.START, spacing=12)
+        # Main box
+        self.main_box = Gtk.Box(valign=Gtk.Align.CENTER, spacing=12)
         self.main_box.set_margin_start(16)
         self.main_box.set_margin_end(16)
+        self.main_box.set_margin_bottom(16)
         self.toast_overlay.set_child(self.main_box)
 
         # Basic inputs root page
         self.inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
         self.inputs_page.set_hexpand(True)
         self.inputs_page.set_vexpand(True)
-        self.inputs_page.set_size_request(270, 0)
+        self.inputs_page.set_size_request(270, 170)
         self.main_box.append(self.inputs_page)
         # Basic inputs page
         self.inputs_group = Adw.PreferencesGroup(title="Inputs")
@@ -125,22 +133,20 @@ class BmiWindow(Adw.ApplicationWindow):
         self.create_input_row("hip_adjustment", "Hip", self.adjustment, "Hip circumference in centimeters", True)
 
         # Arrow icon
-        self.icon = Gtk.Image()
-        self.icon.set_from_icon_name("go-next-symbolic")
+        self.icon = Gtk.Image(icon_name="go-next-symbolic")
         self.icon.set_pixel_size(42)
         self.main_box.append(self.icon)
 
         # Simple results root box
-        self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, halign=Gtk.Align.CENTER, valign=Gtk.Align.CENTER, spacing=6)
+        self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER, spacing=6)
         self.right_box.set_hexpand(True)
         self.right_box.set_vexpand(True)
         self.right_box.set_size_request(175, 0)
         self.right_box.set_margin_end(16)
         self.main_box.append(self.right_box)
         # 'BMI:' label
-        self.result_label = Gtk.Label()
+        self.result_label = Gtk.Label(label="BMI:")
         self.result_label.add_css_class("title-2")
-        self.result_label.set_label("BMI:")
         self.right_box.append(self.result_label)
         # The button which shows the BMI number
         self.bmi_button = Gtk.Button(halign=Gtk.Align.CENTER)
@@ -155,7 +161,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.right_box.append(self.result_feedback_label)
 
         # Advanced results root page
-        self.right_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.right_page = Adw.PreferencesPage(halign=Gtk.Align.FILL)
         self.right_page.set_size_request(290, 0)
         self.main_box.append(self.right_page)
         # Advanced results group
@@ -204,7 +210,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.widget.add_suffix(self.label)
         self.right_group.add(self.widget)
 
-    # Copying text from result row
+    # Copying text from result widget
     def clipboard_copy(self, widget):
         # Copying the result label from a result row
         if widget.get_name() == "AdwActionRow":
@@ -217,9 +223,9 @@ class BmiWindow(Adw.ApplicationWindow):
         # Copying a button's label
         if widget.get_name() == "GtkButton":
             value = widget.get_label();
-        print(f"Copied: {value}")
         value = str(value) # Gdk Clipboard only accepts strings
         clipboard = Gdk.Display.get_default().get_clipboard()
+        print(f"Copied: {value}")
         Gdk.Clipboard.set(clipboard, value);
         # Creating and showing a toast
         self.toast = Adw.Toast(title="Result copied", timeout=1)
@@ -251,7 +257,7 @@ class BmiWindow(Adw.ApplicationWindow):
     # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
     def set_result(self, widget, value, over, css_class, label):
         if value >= over:
-            widget.remove_css_class("accent")
+            widget.remove_css_class("light-blue")
             widget.remove_css_class("success")
             widget.remove_css_class("warning")
             widget.remove_css_class("error")
@@ -327,17 +333,17 @@ class BmiWindow(Adw.ApplicationWindow):
         #     bmi_overweight = age_curve * (25.1 - 16.9)
         #     bmi_overweight = bmi_overweight + 16.9
 
-        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight3, "accent", "Underweight [Severe]")
-        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight2, "accent", "Underweight [Moderate]")
-        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight1, "accent", "Underweight [Mild]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight3, "light-blue", "Underweight [Severe]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight2, "light-blue", "Underweight [Moderate]")
+        self.set_result(self.result_bmi_row, self.bmi, bmi_underweight1, "light-blue", "Underweight [Mild]")
         self.set_result(self.result_bmi_row, self.bmi, bmi_healthy, "success", "Healthy")
         self.set_result(self.result_bmi_row, self.bmi, bmi_overweight, "warning", "Overweight")
         self.set_result(self.result_bmi_row, self.bmi, bmi_obese1, "error", "Obese [Class 1]")
         self.set_result(self.result_bmi_row, self.bmi, bmi_obese2, "error", "Obese [Class 2]")
         self.set_result(self.result_bmi_row, self.bmi, bmi_obese3, "error", "Obese [Class 3]")
 
-        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight3, "accent", "Underweight")
-        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight1, "accent", "Underweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight3, "light-blue", "Underweight")
+        self.set_result(self.result_feedback_label, self.bmi, bmi_underweight1, "light-blue", "Underweight")
         self.set_result(self.result_feedback_label, self.bmi, bmi_healthy, "success", "Healthy")
         self.set_result(self.result_feedback_label, self.bmi, bmi_overweight, "warning", "Overweight")
         self.set_result(self.result_feedback_label, self.bmi, bmi_obese1, "error", "Obese")
@@ -368,7 +374,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.bri = self.bri / ((self.height_adjustment.get_value() / 2)**2)
         self.bri = 364.2 - 365.5 * math.sqrt(1 - self.bri)
         self.result_bri_row_label.set_label(str(round(self.bri, 2)))
-        self.set_result(self.result_bri_row, self.bri, 0, "accent", "Very lean")
+        self.set_result(self.result_bri_row, self.bri, 0, "light-blue", "Very lean")
         self.set_result(self.result_bri_row, self.bri, 3.41, "success", "Healthy")
         self.set_result(self.result_bri_row, self.bri, 4.45, "warning", "Overweight")
         self.set_result(self.result_bri_row, self.bri, 5.46, "warning", "Obese")
