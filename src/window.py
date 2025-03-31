@@ -18,10 +18,20 @@
 #
 # SPDX-License-Identifier: GPL-2.0-or-later
 
+# Imports
 from gi.repository import Adw, Gtk, Gdk, Gio
 import math
 
+# Shorthand vars
 app_id = "io.github.philippkosarev.bmi"
+# Alignment
+start = Gtk.Align.START
+end = Gtk.Align.END
+center = Gtk.Align.CENTER
+fill = Gtk.Align.FILL
+# Orientations
+horizontal = Gtk.Orientation.HORIZONTAL
+vertical = Gtk.Orientation.VERTICAL
 
 class BmiWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'BmiWindow'
@@ -79,14 +89,14 @@ class BmiWindow(Adw.ApplicationWindow):
         self.toast_overlay = Adw.ToastOverlay()
         self.drag.set_child(self.toast_overlay)
         # Main box
-        self.main_box = Gtk.Box(valign=Gtk.Align.CENTER, spacing=12)
+        self.main_box = Gtk.Box(valign=center, spacing=12)
         self.main_box.set_margin_start(16)
         self.main_box.set_margin_end(16)
         self.main_box.set_margin_bottom(16)
         self.toast_overlay.set_child(self.main_box)
 
         # Basic inputs root page
-        self.inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.inputs_page = Adw.PreferencesPage(halign=fill, valign=start)
         self.inputs_page.set_hexpand(True)
         self.inputs_page.set_vexpand(True)
         self.inputs_page.set_size_request(270, 170)
@@ -102,7 +112,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.create_input_row("weight_adjustment", "Waist", self.adjustment, "Weight in kilograms", False)
 
         # Advanced inputs root page
-        self.advanced_inputs_page = Adw.PreferencesPage(halign=Gtk.Align.FILL, valign=Gtk.Align.START)
+        self.advanced_inputs_page = Adw.PreferencesPage(halign=fill, valign=start)
         self.advanced_inputs_page.set_hexpand(True)
         self.advanced_inputs_page.set_vexpand(True)
         self.advanced_inputs_page.set_size_request(290, 320)
@@ -138,7 +148,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.main_box.append(self.icon)
 
         # Simple results root box
-        self.right_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, valign=Gtk.Align.CENTER, spacing=6)
+        self.right_box = Gtk.Box(orientation=vertical, valign=center, spacing=6)
         self.right_box.set_hexpand(True)
         self.right_box.set_vexpand(True)
         self.right_box.set_size_request(175, 0)
@@ -149,7 +159,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.result_label.add_css_class("title-2")
         self.right_box.append(self.result_label)
         # The button which shows the BMI number
-        self.bmi_button = Gtk.Button(halign=Gtk.Align.CENTER)
+        self.bmi_button = Gtk.Button(halign=center)
         self.bmi_button.set_tooltip_text("Copy BMI")
         self.bmi_button.set_css_classes(["pill", "title-1"])
         self.bmi_button.connect('clicked', self.clipboard_copy)
@@ -161,7 +171,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.right_box.append(self.result_feedback_label)
 
         # Advanced results root page
-        self.right_page = Adw.PreferencesPage(halign=Gtk.Align.FILL)
+        self.right_page = Adw.PreferencesPage(halign=fill)
         self.right_page.set_size_request(290, 0)
         self.main_box.append(self.right_page)
         # Advanced results group
