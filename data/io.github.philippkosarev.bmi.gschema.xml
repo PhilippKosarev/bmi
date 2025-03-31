@@ -5,6 +5,10 @@
 		  <default>false</default>
 		  <summary>Forget height and weight on quit</summary>
 	  </key>
+	  <key name="metric" type="b">
+		  <default>true</default>
+		  <summary>Whether the app uses metric or imperial units</summary>
+	  </key>
 	  <key name="height" type="i">
 		  <default>175</default>
 		  <summary>Height in centimeters</summary>

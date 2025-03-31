@@ -96,26 +96,30 @@ class BmiWindow(Adw.ApplicationWindow):
         self.toast_overlay.set_child(self.main_box)
 
         # Basic inputs root page
-        self.inputs_page = Adw.PreferencesPage(halign=fill, valign=start)
+        self.inputs_page = Adw.PreferencesPage(halign=center)
         self.inputs_page.set_hexpand(True)
         self.inputs_page.set_vexpand(True)
-        self.inputs_page.set_size_request(270, 170)
+        self.inputs_page.set_size_request(300, 170)
         self.main_box.append(self.inputs_page)
         # Basic inputs page
         self.inputs_group = Adw.PreferencesGroup(title="Inputs")
         self.inputs_page.add(self.inputs_group)
         # Height input row
-        self.adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1,page_increment=10, value=self.settings["height"])
-        self.create_input_row("height_adjustment", "Height", self.adjustment, "Height in centimetres", False)
+        self.adjustment = Gtk.Adjustment(lower= 50, upper=267, step_increment=1, \
+        page_increment=10, value=self.settings["height"])
+        self.create_input_row("height_adjustment", "Height", self.adjustment, \
+        "Height in centimetres", False)
         # Weight input row
-        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, page_increment=10, value=self.settings["weight"])
-        self.create_input_row("weight_adjustment", "Waist", self.adjustment, "Weight in kilograms", False)
+        self.adjustment = Gtk.Adjustment(lower= 10, upper=650, step_increment=1, \
+        page_increment=10, value=self.settings["weight"])
+        self.create_input_row("weight_adjustment", "Waist", self.adjustment, \
+        "Weight in kilograms", False)
 
         # Advanced inputs root page
-        self.advanced_inputs_page = Adw.PreferencesPage(halign=fill, valign=start)
+        self.advanced_inputs_page = Adw.PreferencesPage(halign=center)
         self.advanced_inputs_page.set_hexpand(True)
         self.advanced_inputs_page.set_vexpand(True)
-        self.advanced_inputs_page.set_size_request(290, 320)
+        self.advanced_inputs_page.set_size_request(300, 330)
         self.main_box.append(self.advanced_inputs_page)
         # Advanced input group
         self.advanced_inputs_group = Adw.PreferencesGroup(title="Advanced inputs")
@@ -132,8 +136,9 @@ class BmiWindow(Adw.ApplicationWindow):
         self.gender_adjustment.set_selected(self.settings["gender"])
         self.advanced_inputs_group.add(self.gender_adjustment)
         # Age input row
-        self.adjustment = Gtk.Adjustment(lower= 5, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
+        self.adjustment = Gtk.Adjustment(lower=18, upper=123, step_increment=1, page_increment=10, value=self.settings["age"])
         self.create_input_row("age_adjustment", "Age", self.adjustment, "Affects healthy/unhealthy thresholds for Waist to Height ratio", True)
+        self.age_adjustment.set_subtitle("Years")
         self.age_adjustment.set_digits(0)
         # Waist circumference input row
         self.adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10, value=self.settings["waist"])
@@ -143,16 +148,14 @@ class BmiWindow(Adw.ApplicationWindow):
         self.create_input_row("hip_adjustment", "Hip", self.adjustment, "Hip circumference in centimeters", True)
 
         # Arrow icon
-        self.icon = Gtk.Image(icon_name="go-next-symbolic")
-        self.icon.set_pixel_size(42)
+        self.icon = Gtk.Image(icon_name="go-next-symbolic", pixel_size=42)
+        self.icon.set_margin_start(10)
         self.main_box.append(self.icon)
 
         # Simple results root box
         self.right_box = Gtk.Box(orientation=vertical, valign=center, spacing=6)
-        self.right_box.set_hexpand(True)
-        self.right_box.set_vexpand(True)
-        self.right_box.set_size_request(175, 0)
-        self.right_box.set_margin_end(16)
+        self.right_box.set_size_request(130, 0)
+        self.right_box.set_margin_end(24)
         self.main_box.append(self.right_box)
         # 'BMI:' label
         self.result_label = Gtk.Label(label="BMI:")
@@ -163,7 +166,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.bmi_button.set_tooltip_text("Copy BMI")
         self.bmi_button.set_css_classes(["pill", "title-1"])
         self.bmi_button.connect('clicked', self.clipboard_copy)
-        self.bmi_button.set_size_request(100, 0)
+        self.bmi_button.set_size_request(110, 0)
         self.right_box.append(self.bmi_button)
         # The label which shows feedback (Underweight/Overweight)
         self.result_feedback_label = Gtk.Label()
@@ -171,8 +174,9 @@ class BmiWindow(Adw.ApplicationWindow):
         self.right_box.append(self.result_feedback_label)
 
         # Advanced results root page
-        self.right_page = Adw.PreferencesPage(halign=fill)
-        self.right_page.set_size_request(290, 0)
+        self.right_page = Adw.PreferencesPage(halign=center)
+        self.right_page.set_size_request(300, 330)
+        self.right_page.set_margin_start(12)
         self.main_box.append(self.right_page)
         # Advanced results group
         self.right_group = Adw.PreferencesGroup(title="Results")
@@ -187,6 +191,7 @@ class BmiWindow(Adw.ApplicationWindow):
         self.init_finished = True
         self.update_mode()
         self.update_results()
+        self.update_units()
 
     # Creates a spin row and adds it to either self.inputs_group or advanced_inputs_group
     def create_input_row(self, widgetName, title, adjustment, tooltip, advanced):
@@ -208,13 +213,11 @@ class BmiWindow(Adw.ApplicationWindow):
         setattr(self, f"{widgetName}_label", Gtk.Label())
         self.widget = getattr(self, widgetName)
         self.label = getattr(self, f"{widgetName}_label")
-    
         self.widget.set_activatable(True)
         self.widget.set_title(title)
         self.widget.connect("activated", self.clipboard_copy)
         self.widget.set_tooltip_text(tooltip)
         self.widget.add_css_class("heading")
-        self.widget.add_css_class("monospace")
         self.label.set_css_classes(["title-3"])
         self.label.set_label("21")
         self.widget.add_suffix(self.label)
@@ -235,7 +238,7 @@ class BmiWindow(Adw.ApplicationWindow):
             value = widget.get_label();
         value = str(value) # Gdk Clipboard only accepts strings
         clipboard = Gdk.Display.get_default().get_clipboard()
-        print(f"Copied: {value}")
+        print(f"Copied result '{value}'")
         Gdk.Clipboard.set(clipboard, value);
         # Creating and showing a toast
         self.toast = Adw.Toast(title="Result copied", timeout=1)
@@ -263,6 +266,22 @@ class BmiWindow(Adw.ApplicationWindow):
             self.right_page.set_visible(True)
             self.right_box.set_visible(False)
             self.inputs_group.set_title("Inputs")
+
+    def update_units(self):
+        self.metric=self.settings["metric"]
+        distance_rows=[self.height_adjustment, self.waist_adjustment, self.hip_adjustment]
+        mass_rows=[self.weight_adjustment]
+        distance="Centimeters"
+        mass="Kilograms"
+
+        if self.metric == False:
+            distance="Feet"
+            mass="Pounds"
+
+        for row in distance_rows:
+            row.set_subtitle(distance)
+        for row in mass_rows:
+            row.set_subtitle(mass)
 
     # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
     def set_result(self, widget, value, over, css_class, label):
@@ -305,8 +324,10 @@ class BmiWindow(Adw.ApplicationWindow):
         if self.age > 50:
             self.waist_to_height_unhealthy = 0.6
 
+        # Average values
         self.waist_to_hip_overweight = 0.85
         self.waist_to_hip_obese = 0.925
+        # Gendered values
         if self.gender == "Female":
             self.waist_to_hip_overweight = 0.8
             self.waist_to_hip_obese = 0.85
