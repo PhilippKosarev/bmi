@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/io/github/philippkosarev/bmi">
     <file>style.css</file>
+    <file>icons/scalable/actions/ruler-angled-symbolic.svg</file>
   </gresource>
 </gresources>

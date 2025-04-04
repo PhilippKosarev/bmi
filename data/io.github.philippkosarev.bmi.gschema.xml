@@ -5,17 +5,17 @@
 		  <default>false</default>
 		  <summary>Forget height and weight on quit</summary>
 	  </key>
-	  <key name="metric" type="b">
-		  <default>true</default>
+	  <key name="imperial" type="b">
+		  <default>false</default>
 		  <summary>Whether the app uses metric or imperial units</summary>
 	  </key>
-	  <key name="height" type="i">
+	  <key name="height" type="d">
 		  <default>175</default>
-		  <summary>Height in centimeters</summary>
+		  <summary>Height in centimetres or inches</summary>
 	  </key>
-	  <key name="weight" type="i">
-		  <default>70</default>
-		  <summary>Weight in kilograms</summary>
+	  <key name="mass" type="d">
+		  <default>68</default>
+		  <summary>Weight in kilograms or pounds</summary>
 	  </key>
 	  <key name="mode" type="i">
 		  <default>0</default>
@@ -29,11 +29,11 @@
 		  <default>0</default>
 		  <summary>Biological gender</summary>
 	  </key>
-	  <key name="waist" type="i">
+	  <key name="waist" type="d">
 		  <default>70</default>
 		  <summary>Waist circumference in centimeters</summary>
 	  </key>
-	  <key name="hip" type="i">
+	  <key name="hip" type="d">
 		  <default>85</default>
 		  <summary>Hip circumference in centimeters</summary>
 	  </key>
