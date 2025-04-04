@@ -376,29 +376,28 @@ class BmiWindow(Adw.ApplicationWindow):
     def convert_input_adjustments(self):
         def row_get_upper(row): return row.get_adjustment().get_upper()
         def row_get_lower(row): return row.get_adjustment().get_lower()
-
         if self.imperial is False:
-          for row in self.distance_rows:
-              new_upper = self.in_to_cm(row_get_upper(row))
-              row.get_adjustment().set_upper(new_upper)
-              new_lower = self.in_to_cm(row_get_lower(row))
-              row.get_adjustment().set_lower(new_lower)
-          for row in self.mass_rows:
-              new_upper = self.lb_to_kg(row_get_upper(row))
-              row.get_adjustment().set_upper(new_upper)
-              new_lower = self.lb_to_kg(row_get_lower(row))
-              row.get_adjustment().set_lower(new_lower)
+            for row in self.distance_rows:
+                new_upper = self.in_to_cm(row_get_upper(row))
+                row.get_adjustment().set_upper(new_upper)
+                new_lower = self.in_to_cm(row_get_lower(row))
+                row.get_adjustment().set_lower(new_lower)
+            for row in self.mass_rows:
+                new_upper = self.lb_to_kg(row_get_upper(row))
+                row.get_adjustment().set_upper(new_upper)
+                new_lower = self.lb_to_kg(row_get_lower(row))
+                row.get_adjustment().set_lower(new_lower)
         else:
-          for row in self.distance_rows:
-              new_upper = self.cm_to_in(row_get_upper(row))
-              row.get_adjustment().set_upper(new_upper)
-              new_lower = self.cm_to_in(row_get_lower(row))
-              row.get_adjustment().set_lower(new_lower)
-          for row in self.mass_rows:
-              new_upper = self.kg_to_lb(row_get_upper(row))
-              row.get_adjustment().set_upper(new_upper)
-              new_lower = self.kg_to_lb(row_get_lower(row))
-              row.get_adjustment().set_lower(new_lower)
+            for row in self.distance_rows:
+                new_upper = self.cm_to_in(row_get_upper(row))
+                row.get_adjustment().set_upper(new_upper)
+                new_lower = self.cm_to_in(row_get_lower(row))
+                row.get_adjustment().set_lower(new_lower)
+            for row in self.mass_rows:
+                new_upper = self.kg_to_lb(row_get_upper(row))
+                row.get_adjustment().set_upper(new_upper)
+                new_lower = self.kg_to_lb(row_get_lower(row))
+                row.get_adjustment().set_lower(new_lower)
 
     # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
     def set_result(self, widget, value, over, css_class, label):
