@@ -190,29 +190,23 @@ class BmiWindow(Adw.ApplicationWindow):
         self.hip_input_row.set_value(self.settings["hip"])
         self.age_input_row.set_value(self.settings["age"])
 
+        # Connecting input rows
         self.distance_rows = [self.height_input_row, self.waist_input_row, self.hip_input_row]
         self.mass_rows = [self.weight_input_row]
         self.metrics_rows = self.distance_rows + self.mass_rows
-        # Connecting input rows
         for row in self.metrics_rows:
             row.connect('changed', self.on_input_changed)
-
-        # Almost done
+        # Updating all
         self.update_all()
-
-        # Converting to imperial if needed
-        forget = self.settings.get_value("forget")
-        imperial = self.settings.get_value("imperial")
-        if imperial:
+        # Switching to imperial if needed
+        if self.imperial:
             self.on_units_button(self)
 
     def update_all(self):
-        # Updating results
         self.update_inputs()
         self.update_results()
         self.update_feedback_thresholds()
         self.update_result_labels()
-        # Updating widgets
         self.update_mode()
         self.update_units_labels()
 
@@ -240,87 +234,22 @@ class BmiWindow(Adw.ApplicationWindow):
             self.weight_input_row.set_title("Jon Brower Minnoch")
 
     def update_results(self):
-        # Aliasing
-        height = self.height
-        mass = self.mass
-        waist = self.waist
-        hip = self.hip
         # Calculating BMI
-        self.bmi = mass / ((height / 100) ** 2)
+        self.bmi = self.mass / ((self.height / 100) ** 2)
         # Calculating Waist to Height ratio
-        self.waist_to_height = waist / height
+        self.waist_to_height = self.waist / self.height
         # Calculating Waist to Hip ratio
-        self.waist_to_hip = waist / hip
+        self.waist_to_hip = self.waist / self.hip
         # Calculating BRI
-        self.bri = 364.2 - (365.5 * math.sqrt((1 - (waist / (math.pi * height)) ** 2)))
-
-    # Creates a spin row and adds it to either self.inputs_group or advanced_inputs_group
-    def create_input_row(self, widgetName, title, adjustment, digits, tooltip, advanced):
-        # Creating AdwSpinRow with name widgetName
-        setattr(self, widgetName, Adw.SpinRow())
-        self.widget = getattr(self, widgetName)
-        # Customizing the SpinRow
-        self.widget.set_title(title)
-        self.widget.set_tooltip_text(tooltip)
-        self.widget.set_adjustment(adjustment)
-        self.widget.set_digits(digits)
-        # Deciding where to add the row
-        if advanced == True: self.advanced_inputs_group.add(self.widget)
-        else: self.inputs_group.add(self.widget)
-
-    # Creates an action row with a label and adds it to self.right_group
-    def create_result_row(self, widgetName, title, tooltip):
-        setattr(self, widgetName, Adw.ActionRow())
-        setattr(self, f"{widgetName}_label", Gtk.Label())
-        self.widget = getattr(self, widgetName)
-        self.label = getattr(self, f"{widgetName}_label")
-        self.widget.set_activatable(True)
-        self.widget.set_title(title)
-        self.widget.connect("activated", self.clipboard_copy)
-        self.widget.set_tooltip_text(tooltip)
-        self.widget.add_css_class("heading")
-        self.label.set_css_classes(["title-3"])
-        self.label.set_label("21")
-        self.widget.add_suffix(self.label)
-        self.right_group.add(self.widget)
-
-    # Copying text from result widget
-    def clipboard_copy(self, widget):
-        # Copying the result label from a result row
-        if widget.get_name() == "AdwActionRow":
-            value = widget.get_first_child().get_first_child() \
-            .get_next_sibling().get_next_sibling().get_next_sibling() \
-            .get_first_child().get_label()
-            # Hackiest way ever, but it works 🤷
-            # Explanation: AdwActionRow has a box inside a box of which the 4th
-            #              child is the "suffixes", inside it is the result label
-        # Copying a button's label
-        if widget.get_name() == "GtkButton":
-            value = widget.get_label();
-        value = str(value) # Gdk Clipboard only accepts strings
-        clipboard = Gdk.Display.get_default().get_clipboard()
-        print(f"Copied result '{value}'")
-        Gdk.Clipboard.set(clipboard, value);
-        # Creating and showing a toast
-        self.toast = Adw.Toast(title="Result copied", timeout=1)
-        self.toast_overlay.add_toast(self.toast)
-
-    # Action, called after value of self.mode_dropdown changes
-    def on_dropdown_value_changed(self, dropdown, _pspec):
-        self.update_mode()
-        self.update_results()
-
-    # Action, called after value of self.height_input_row or other inputs changes
-    def on_input_changed(self, _scroll):
-        self.update_inputs()
-        self.update_results()
-        self.update_feedback_thresholds()
-        self.update_result_labels()
+        try:
+            self.bri = 364.2 - (365.5 * math.sqrt((1 - (self.waist / (math.pi * self.height)) ** 2)))
+        except:
+            self.bri = 0
+        # Sometimes '1 - (self.waist / (math.pi * self.height)' < 0 so sqrt() errors out
 
     # Hides or shows simple and advanced input and output widgets depending on the selected mode
     def update_mode(self):
-        mode = self.mode_dropdown.get_selected()
-        if mode == 0:
+        if self.mode_dropdown.get_selected() == 0:
             self.advanced_inputs_page.set_visible(False)
             self.right_page.set_visible(False)
             self.right_box.set_visible(True)
@@ -331,73 +260,67 @@ class BmiWindow(Adw.ApplicationWindow):
             self.right_box.set_visible(False)
             self.inputs_group.set_title("Inputs")
 
+    # Action, called after value of self.height_input_row or other inputs changes
+    def on_input_changed(self, _scroll):
+        self.update_inputs()
+        self.update_results()
+        self.update_feedback_thresholds()
+        self.update_result_labels()
+
+    # Action, called after value of self.mode_dropdown changes
+    def on_dropdown_value_changed(self, dropdown, _pspec):
+        self.update_mode()
+        self.update_results()
+
     # Called by self.units_button
     def on_units_button(self, _button):
-        # Getting relevant vars
         self.update_inputs()
-        # Calling functions
+        self.convert_inputs()
         self.update_units_labels()
-        self.convert_input_adjustments()
-        self.convert_input_values()
         self.update_results()
+        self.update_result_labels()
 
     # Changes input rows' subtitles to cm/kg or in/ft
     def update_units_labels(self):
-        # Setting subtitles and converting values
+        # Setting vars
         if self.imperial is False:
-            for row in self.distance_rows:
-                row.set_subtitle("Centimetres")
-            for row in self.mass_rows:
-                row.set_subtitle("Kilograms")
+            distance = "Centimetres"
+            mass = "Kilograms"
         else:
-            for row in self.distance_rows:
-                row.set_subtitle("Inches")
-            for row in self.mass_rows:
-                row.set_subtitle("Pounds")
-    # For easier conversions
-    def in_to_cm(self, value): value *= 2.54; return value
-    def cm_to_in(self, value): value *= 0.3937008; return value
-    def kg_to_lb(self, value): value *= 2.204623; return value
-    def lb_to_kg(self, value): value *= 0.4535924; return value
-    # Converts input rows' values
-    def convert_input_values(self):
-        # Converting
+            distance = "Inches"
+            mass = "Pounds"
+        # Setting subtitles
+        for row in self.distance_rows:
+            row.set_subtitle(distance)
+        for row in self.mass_rows:
+            row.set_subtitle(mass)
+
+    # Converting row adjustment limits and values
+    def convert_inputs(self):
+        # Helper functions
+        def row_get_limits(row):
+            return [row.get_adjustment().get_lower(), row.get_adjustment().get_upper()]
+        def row_set_limits(row, limits):
+            row.get_adjustment().set_lower(limits[0])
+            row.get_adjustment().set_upper(limits[1])
+        # Defining conversions
         if self.imperial is False:
-            for row in self.distance_rows:
-                row.set_value(self.in_to_cm(row.get_value()))
-            for row in self.mass_rows:
-                row.set_value(self.lb_to_kg(row.get_value()))
+            convert_distance = self.in_to_cm
+            convert_mass = self.lb_to_kg
         else:
-            for row in self.distance_rows:
-                row.set_value(self.cm_to_in(row.get_value()))
-            for row in self.mass_rows:
-                row.set_value(self.kg_to_lb(row.get_value()))
-    # Updating input rows' adjustments
-    def convert_input_adjustments(self):
-        def row_get_upper(row): return row.get_adjustment().get_upper()
-        def row_get_lower(row): return row.get_adjustment().get_lower()
-        if self.imperial is False:
-            for row in self.distance_rows:
-                new_upper = self.in_to_cm(row_get_upper(row))
-                row.get_adjustment().set_upper(new_upper)
-                new_lower = self.in_to_cm(row_get_lower(row))
-                row.get_adjustment().set_lower(new_lower)
-            for row in self.mass_rows:
-                new_upper = self.lb_to_kg(row_get_upper(row))
-                row.get_adjustment().set_upper(new_upper)
-                new_lower = self.lb_to_kg(row_get_lower(row))
-                row.get_adjustment().set_lower(new_lower)
-        else:
-            for row in self.distance_rows:
-                new_upper = self.cm_to_in(row_get_upper(row))
-                row.get_adjustment().set_upper(new_upper)
-                new_lower = self.cm_to_in(row_get_lower(row))
-                row.get_adjustment().set_lower(new_lower)
-            for row in self.mass_rows:
-                new_upper = self.kg_to_lb(row_get_upper(row))
-                row.get_adjustment().set_upper(new_upper)
-                new_lower = self.kg_to_lb(row_get_lower(row))
-                row.get_adjustment().set_lower(new_lower)
+            convert_distance = self.cm_to_in
+            convert_mass = self.kg_to_lb
+        # Setting limits and values
+        for row in self.distance_rows:
+            limits = row_get_limits(row)
+            for i in range(len(limits)): limits[i] = round(convert_distance(limits[i]), 1)
+            row_set_limits(row, limits)
+            row.set_value(convert_distance(round(row.get_value(), 1)))
+        for row in self.mass_rows:
+            limits = row_get_limits(row)
+            for i in range(len(limits)): limits[i] = round(convert_mass(limits[i]), 1)
+            row_set_limits(row, limits)
+            row.set_value(convert_mass(round(row.get_value(), 1)))
 
     # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
     def set_result(self, widget, value, over, css_class, label):
@@ -503,6 +426,63 @@ class BmiWindow(Adw.ApplicationWindow):
         set_result_for_bri_row(self.bri_healthy, "warning", "Overweight")
         set_result_for_bri_row(self.bri_overweight1, "warning", "Obese")
         set_result_for_bri_row(self.bri_overweight2, "error", "Extremely obese")
+
+        # Creates a spin row and adds it to either self.inputs_group or advanced_inputs_group
+    def create_input_row(self, widgetName, title, adjustment, digits, tooltip, advanced):
+        # Creating AdwSpinRow with name widgetName
+        setattr(self, widgetName, Adw.SpinRow())
+        self.widget = getattr(self, widgetName)
+        # Customizing the SpinRow
+        self.widget.set_title(title)
+        self.widget.set_tooltip_text(tooltip)
+        self.widget.set_adjustment(adjustment)
+        self.widget.set_digits(digits)
+        # Deciding where to add the row
+        if advanced == True: self.advanced_inputs_group.add(self.widget)
+        else: self.inputs_group.add(self.widget)
+
+    # Creates an action row with a label and adds it to self.right_group
+    def create_result_row(self, widgetName, title, tooltip):
+        setattr(self, widgetName, Adw.ActionRow())
+        setattr(self, f"{widgetName}_label", Gtk.Label())
+        self.widget = getattr(self, widgetName)
+        self.label = getattr(self, f"{widgetName}_label")
+        self.widget.set_activatable(True)
+        self.widget.set_title(title)
+        self.widget.connect("activated", self.clipboard_copy)
+        self.widget.set_tooltip_text(tooltip)
+        self.widget.add_css_class("heading")
+        self.label.set_css_classes(["title-3"])
+        # self.label.set_label("21")
+        self.widget.add_suffix(self.label)
+        self.right_group.add(self.widget)
+
+    # Copying text from result widget
+    def clipboard_copy(self, widget):
+        # Copying the result label from a result row
+        if widget.get_name() == "AdwActionRow":
+            value = widget.get_first_child().get_first_child() \
+            .get_next_sibling().get_next_sibling().get_next_sibling() \
+            .get_first_child().get_label()
+            # Hackiest way ever, but it works 🤷
+            # Explanation: AdwActionRow has a box inside a box of which the 4th
+            #              child is the "suffixes", inside it is the result label
+        # Copying a button's label
+        if widget.get_name() == "GtkButton":
+            value = widget.get_label();
+        value = str(value) # Gdk Clipboard only accepts strings
+        clipboard = Gdk.Display.get_default().get_clipboard()
+        print(f"Copied result '{value}'")
+        Gdk.Clipboard.set(clipboard, value);
+        # Creating and showing a toast
+        self.toast = Adw.Toast(title="Result copied", timeout=1)
+        self.toast_overlay.add_toast(self.toast)
+
+    # For easier conversions
+    def in_to_cm(self, value): value *= 2.54; return value
+    def cm_to_in(self, value): value *= 0.3937008; return value
+    def kg_to_lb(self, value): value *= 2.204623; return value
+    def lb_to_kg(self, value): value *= 0.4535924; return value
 
     # Show the About app dialog
     def show_about(self, _button):
