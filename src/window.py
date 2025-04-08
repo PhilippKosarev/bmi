@@ -171,7 +171,7 @@ class BmiWindow(Adw.ApplicationWindow):
         # Advanced results root page
         self.right_page = Adw.PreferencesPage(halign=center)
         self.right_page.set_size_request(300, 330)
-        self.right_page.set_margin_start(12)
+        self.right_page.set_margin_start(24)
         self.main_box.append(self.right_page)
         # Advanced results group
         self.right_group = Adw.PreferencesGroup(title="Results")
