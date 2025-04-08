@@ -105,10 +105,10 @@ class BmiWindow(Adw.ApplicationWindow):
         self.inputs_page.add(self.inputs_group)
         # Height input row
         self.height_adjustment = Gtk.Adjustment(lower=50, upper=267, step_increment=1, page_increment=10)
-        self.create_input_row("height_input_row", "Height", self.height_adjustment, 0, "Affects BMI and BRI", False)
+        self.create_input_row("height_input_row", "Height", self.height_adjustment, 1, "Affects BMI and BRI", False)
         # Weight input row
         self.weight_adjustment = Gtk.Adjustment(lower=10, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("weight_input_row", "Weight", self.weight_adjustment, 0, "Affects BMI", False)
+        self.create_input_row("weight_input_row", "Weight", self.weight_adjustment, 1, "Affects BMI", False)
 
         # Advanced inputs root page
         self.advanced_inputs_page = Adw.PreferencesPage(halign=center)
@@ -133,14 +133,13 @@ class BmiWindow(Adw.ApplicationWindow):
         # Age input row
         self.age_adjustment = Gtk.Adjustment(lower=18, upper=123, step_increment=1, page_increment=10)
         self.create_input_row("age_input_row", "Age", self.age_adjustment, 0, "Affects healthy/unhealthy thresholds for Waist to Height ratio", True)
-        self.age_input_row.set_digits(0)
         self.age_input_row.set_subtitle("Years")
         # Waist circumference input row
         self.waist_adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("waist_input_row", "Waist", self.waist_adjustment, 0, "Affects Waist to Height ratio, Waist to Hip ratio and BRI", True)
+        self.create_input_row("waist_input_row", "Waist", self.waist_adjustment, 1, "Affects Waist to Height ratio, Waist to Hip ratio and BRI", True)
         # Hip circumference input row
         self.hip_adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("hip_input_row", "Hip", self.hip_adjustment, 0, "Affects Waist to Hip ratio", True)
+        self.create_input_row("hip_input_row", "Hip", self.hip_adjustment, 1, "Affects Waist to Hip ratio", True)
 
         # Arrow icon
         self.icon = Gtk.Image(icon_name="go-next-symbolic", pixel_size=32)
