@@ -204,7 +204,6 @@ class BmiWindow(Adw.ApplicationWindow):
     def update_all(self):
         self.update_inputs()
         self.update_results()
-        self.update_feedback_thresholds()
         self.update_result_labels()
         self.update_mode()
         self.update_units_labels()
@@ -263,7 +262,6 @@ class BmiWindow(Adw.ApplicationWindow):
     def on_input_changed(self, _scroll):
         self.update_inputs()
         self.update_results()
-        self.update_feedback_thresholds()
         self.update_result_labels()
 
     # Action, called after value of self.mode_dropdown changes
@@ -321,110 +319,107 @@ class BmiWindow(Adw.ApplicationWindow):
             row_set_limits(row, limits)
             row.set_value(convert_mass(round(row.get_value(), 1)))
 
-    # A more convenient way to set result colours and text on the self.result_feedback_label and self.result_rows
-    def set_result(self, widget, value, over, css_class, label):
-        if value >= over:
+    def get_results(self):
+        # Getting dynamic values
+        def get_whtr_unhealthy():
+            if self.age > 40:   return ((self.age-40)/100)+0.5
+            elif self.age > 50: return 0.6
+            else:               return 0.5
+        def get_whr_overweight():
+            if self.gender == "Female": return 0.8
+            elif self.gender == "Male": return 0.9
+            else:                       return 0.85
+        def get_whr_obese():
+          if self.gender == "Female": return 0.85
+          elif self.gender == "Male": return 1
+          else:                       return 0.925
+        # Returning results
+        return {
+          'basic_bmi': {
+            'widget': self.result_feedback_label,
+            'label':  self.bmi_button,
+            'value':  int(round(self.bmi, 0)),
+            'thresholds': [
+              {'text': _('Underweight'),     'value': 0,    'style': 'light-blue'},
+              {'text': _('Healthy'),         'value': 18.5, 'style': 'success'},
+              {'text': _('Overweight'),      'value': 25,   'style': 'warning'},
+              {'text': _('Obese'),           'value': 30,   'style': 'error'},
+              {'text': _('Extremely obese'), 'value': 40,   'style': 'error'},
+            ]
+          },
+          'bmi': {
+            'widget': self.result_bmi_row,
+            'label': self.result_bmi_row_label,
+            'value':  round(self.bmi, 1),
+            'thresholds': [
+              {'text': _('Underweight [Severe]'),   'value': 0,    'style': 'light-blue'},
+              {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 'light-blue'},
+              {'text': _('Underweight [Mild]'),     'value': 17,   'style': 'light-blue'},
+              {'text': _('Healthy'),                'value': 18.5, 'style': 'success'},
+              {'text': _('Overweight'),             'value': 25,   'style': 'warning'},
+              {'text': _('Obese [Class 1]'),        'value': 30,   'style': 'error'},
+              {'text': _('Obese [Class 2]'),        'value': 35,   'style': 'error'},
+              {'text': _('Obese [Class 3]'),        'value': 40,   'style': 'error'},
+            ]
+          },
+          'whtr': {
+            'widget': self.result_waist_to_height_row,
+            'label': self.result_waist_to_height_row_label,
+            'value':  round(self.waist_to_height, 2),
+            'thresholds': [
+              {'text': _('Healthy'),   'value': 0,                    'style': 'success'},
+              {'text': _('Unhealthy'), 'value': get_whtr_unhealthy(), 'style': 'warning'},
+            ]
+          },
+          'whr': {
+            'widget': self.result_waist_to_hip_row,
+            'label': self.result_waist_to_hip_row_label,
+            'value':  round(self.waist_to_hip, 2),
+            'thresholds': [
+              {'text': _('Healthy'),    'value': 0,                    'style': 'success'},
+              {'text': _('Overweight'), 'value': get_whr_overweight(), 'style': 'warning'},
+              {'text': _('Obese'),      'value': get_whr_obese(),      'style': 'error'},
+            ]
+          },
+          'bri': {
+            'widget': self.result_bri_row,
+            'label': self.result_bri_row_label,
+            'value':  round(self.bri, 2),
+            'thresholds': [
+              {'text': _('Very lean'),     'value': 0,    'style': 'light-blue'},
+              {'text': _('Lean'),          'value': 3.41, 'style': 'success'},
+              {'text': _('Average'),       'value': 4.45, 'style': 'success'},
+              {'text': _('Above average'), 'value': 5.46, 'style': 'warning'},
+              {'text': _('High'),          'value': 6.91, 'style': 'error'},
+            ]
+          },
+        }
+
+    def update_result_labels(self):
+        def clear_css(widget):
             widget.remove_css_class("light-blue")
             widget.remove_css_class("success")
             widget.remove_css_class("warning")
             widget.remove_css_class("error")
-            if widget.get_name() == "GtkLabel":
-                widget.set_label(label)
-                widget.add_css_class(css_class)
-            if widget.get_name() == "AdwActionRow":
-                widget.set_subtitle(label)
-                widget.add_css_class(css_class)
-
-    def update_feedback_thresholds(self):
-        # Works if value is equal or more than specified
-        # BMI thresholds
-        self.bmi_underweight3 = 0
-        self.bmi_underweight2 = 16
-        self.bmi_underweight1 = 17
-        self.bmi_healthy = 18.5
-        self.bmi_overweight = 25
-        self.bmi_obese1 = 30
-        self.bmi_obese2 = 35
-        self.bmi_obese3 = 40
-        # Waist to Height thresholds
-        if self.age > 40:
-            self.waist_to_height_unhealthy = ((self.age-40)/100)+0.5
-        elif self.age > 50:
-            self.waist_to_height_unhealthy = 0.6
-        else:
-            self.waist_to_height_unhealthy = 0.5
-        # Waist to Hip thresholds
-        if self.gender == "Female":
-            self.waist_to_hip_overweight = 0.8
-            self.waist_to_hip_obese = 0.85
-        elif self.gender == "Male":
-            self.waist_to_hip_overweight = 0.9
-            self.waist_to_hip_obese = 1
-        else:
-            self.waist_to_hip_overweight = 0.85
-            self.waist_to_hip_obese = 0.925
-        # BRI thresholds
-        self.bri_underweight2 = 0
-        self.bri_underweight1 = 3.41
-        self.bri_healthy = 4.45
-        self.bri_overweight1 = 5.46
-        self.bri_overweight2 = 6.91
-
-    def update_result_labels(self):
-        # Converting results to strings
-        def round_to_str(value, digits): return str(round(value, digits))
-        simple_bmi_result = str(int(round(self.bmi, 0)))
-        advanced_bmi_result = round_to_str(self.bmi, 1)
-        advanced_waist_to_height_result = round_to_str(self.waist_to_height, 2)
-        advanced_waist_to_hip_result = round_to_str(self.waist_to_hip, 2)
-        advanced_bri_result = round_to_str(self.bri, 2)
-
-        # Setting simple BMI results
-        self.bmi_button.set_label(simple_bmi_result)
-        def set_result_for_bmi_label(over, css_class, label):
-            self.set_result(self.result_feedback_label, self.bmi, over, css_class, label)
-        set_result_for_bmi_label(self.bmi_underweight3, "light-blue", _("Underweight"))
-        set_result_for_bmi_label(self.bmi_healthy, "success", _("Healthy"))
-        set_result_for_bmi_label(self.bmi_overweight, "warning", _("Overweight"))
-        set_result_for_bmi_label(self.bmi_obese1, "error", _("Obese"))
-        set_result_for_bmi_label(self.bmi_obese3, "error", _("Extremely obese"))
-        # Setting advanced BMI results
-        self.result_bmi_row_label.set_label(advanced_bmi_result)
-        def set_result_for_bmi_row(over, css_class, label):
-            self.set_result(self.result_bmi_row, self.bmi, over, css_class, label)
-        set_result_for_bmi_row(self.bmi_underweight3, "light-blue", _("Underweight [Severe]"))
-        set_result_for_bmi_row(self.bmi_underweight2, "light-blue", _("Underweight [Moderate]"))
-        set_result_for_bmi_row(self.bmi_underweight1, "light-blue", _("Underweight [Mild]"))
-        set_result_for_bmi_row(self.bmi_healthy, "success", _("Healthy"))
-        set_result_for_bmi_row(self.bmi_overweight, "warning", _("Overweight"))
-        set_result_for_bmi_row(self.bmi_obese1, "error", _("Obese [Class 1]"))
-        set_result_for_bmi_row(self.bmi_obese2, "error", _("Obese [Class 2]"))
-        set_result_for_bmi_row(self.bmi_obese3, "error", _("Obese [Class 3]"))
-
-        # Setting advanced Waist to Height results
-        self.result_waist_to_height_row_label.set_label(advanced_waist_to_height_result)
-        def set_result_for_bri_row(over, css_class, label):
-            self.set_result(self.result_waist_to_height_row, self.waist_to_height, over, css_class, label)
-        set_result_for_bri_row(0, "success", "Healthy")
-        set_result_for_bri_row(self.waist_to_height_unhealthy, "warning", _("Unhealthy"))
-
-        # Setting advanced Waist to Hip results
-        self.result_waist_to_hip_row_label.set_label(advanced_waist_to_hip_result)
-        def set_result_for_waist_to_hip_row(over, css_class, label):
-            self.set_result(self.result_waist_to_hip_row, self.waist_to_hip, over, css_class, label)
-        set_result_for_waist_to_hip_row(0, "success", "Healthy")
-        set_result_for_waist_to_hip_row(self.waist_to_hip_overweight, "warning", _("Overweight"))
-        set_result_for_waist_to_hip_row(self.waist_to_hip_obese, "error", _("Obese"))
-
-        # Setting advanced BRI results
-        self.result_bri_row_label.set_label(advanced_bri_result)
-        def set_result_for_bri_row(over, css_class, label):
-            self.set_result(self.result_bri_row, self.bri, over, css_class, label)
-        set_result_for_bri_row(self.bri_underweight2, "light-blue", _("Very lean"))
-        set_result_for_bri_row(self.bri_underweight1, "success", _("Healthy"))
-        set_result_for_bri_row(self.bri_healthy, "warning", _("Overweight"))
-        set_result_for_bri_row(self.bri_overweight1, "warning", _("Obese"))
-        set_result_for_bri_row(self.bri_overweight2, "error", _("Extremely obese"))
+        results = self.get_results()
+        for item in results:
+          widget = results.get(item).get('widget')
+          label = results.get(item).get('label')
+          value = results.get(item).get('value')
+          label.set_label(str(value))
+          thresholds = results.get(item).get('thresholds')
+          for threshold in thresholds:
+              threshold_value = threshold.get('value')
+              text = threshold.get('text')
+              style = threshold.get('style')
+              if value >= threshold_value:
+                  clear_css(widget)
+                  if widget.get_name() == "GtkLabel":
+                      widget.set_label(text)
+                      widget.add_css_class(style)
+                  if widget.get_name() == "AdwActionRow":
+                      widget.set_subtitle(text)
+                      widget.add_css_class(style)
 
         # Creates a spin row and adds it to either self.inputs_group or advanced_inputs_group
     def create_input_row(self, widgetName, title, adjustment, digits, tooltip, advanced):
