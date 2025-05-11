@@ -30,6 +30,7 @@ bmi_sources = [
   '__init__.py',
   'main.py',
   'window.py',
+  'bmi_widgets.py',
 ]
 
 install_data(bmi_sources, install_dir: moduledir)

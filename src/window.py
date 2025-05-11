@@ -19,8 +19,9 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 # Imports
-from gi.repository import Adw, Gtk, Gdk, Gio
+from gi.repository import Gtk, Adw, Gdk, Gio
 import math
+from .bmi_widgets import *
 
 # Shorthand vars
 app_id = "io.github.philippkosarev.bmi"
@@ -61,7 +62,7 @@ class BmiWindow(Adw.ApplicationWindow):
         # Mode dropdown
         self.mode_dropdown = Gtk.DropDown()
         modes_list = Gtk.StringList()
-        modes = ["BMI (Basic)", "BMI (Advanced)"]
+        modes = [f"BMI ({_('Basic')})", f"BMI ({_('Advanced')})"]
         for mode in modes:
             modes_list.append(mode)
         self.mode_dropdown.set_model(modes_list)
@@ -103,12 +104,19 @@ class BmiWindow(Adw.ApplicationWindow):
         # Basic inputs group
         self.inputs_group = Adw.PreferencesGroup(title=_("Inputs"))
         self.inputs_page.add(self.inputs_group)
-        # Height input row
-        self.height_adjustment = Gtk.Adjustment(lower=50, upper=267, step_increment=1, page_increment=10)
-        self.create_input_row("height_input_row", _("Height"), self.height_adjustment, 1, "Affects BMI and BRI", False)
-        # Weight input row
-        self.weight_adjustment = Gtk.Adjustment(lower=10, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("weight_input_row", _("Weight"), self.weight_adjustment, 1, "Affects BMI", False)
+        # Basic inputs
+        basic_inputs = [
+          # Height input
+          {'title': _('Height'), 'type': 'distance',
+          'setting_key': 'height', 'min': 50, 'max': 267,
+          'tooltip': _('Affects BMI and BRI')},
+          # Weight input
+          {'title': _('Weight'), 'type': 'weight',
+          'setting_key': 'mass', 'min': 15, 'max': 650,
+          'tooltip': _('Affects BMI')},
+        ]
+        self.add_inputs_to_group(basic_inputs, self.inputs_group)
+        self.inputs = basic_inputs
 
         # Advanced inputs root page
         self.advanced_inputs_page = Adw.PreferencesPage(halign=center)
@@ -119,27 +127,27 @@ class BmiWindow(Adw.ApplicationWindow):
         # Advanced input group
         self.advanced_inputs_group = Adw.PreferencesGroup(title=_("Advanced inputs"))
         self.advanced_inputs_page.add(self.advanced_inputs_group)
-        # Gender input row
-        self.gender_adjustment = Adw.ComboRow(title=_("Gender"))
-        self.gender_adjustment.set_tooltip_text(_("Affects healthy/unhealthy thresholds for Waist to Hip ratio"))
-        gender_list = Gtk.StringList()
-        self.gender_adjustment.set_model(gender_list)
-        genders = [_("Average"), _("Female"), _("Male")]
-        for gender in genders:
-            gender_list.append(gender)
-        self.gender_adjustment.set_selected(self.settings["gender"])
-        self.gender_adjustment.connect('notify::selected-item', self.on_dropdown_value_changed)
-        self.advanced_inputs_group.add(self.gender_adjustment)
-        # Age input row
-        self.age_adjustment = Gtk.Adjustment(lower=18, upper=123, step_increment=1, page_increment=10)
-        self.create_input_row("age_input_row", _("Age"), self.age_adjustment, 0, _("Affects healthy/unhealthy thresholds for Waist to Height ratio"), True)
-        self.age_input_row.set_subtitle("Years")
-        # Waist circumference input row
-        self.waist_adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("waist_input_row", _("Waist"), self.waist_adjustment, 1, _("Affects Waist to Height ratio, Waist to Hip ratio and BRI"), True)
-        # Hip circumference input row
-        self.hip_adjustment = Gtk.Adjustment(lower= 25, upper=650, step_increment=1, page_increment=10)
-        self.create_input_row("hip_input_row", _("Hip"), self.hip_adjustment, 1, _("Affects Waist to Hip ratio"), True)
+        # Advanced inputs
+        advanced_inputs = [
+          # Gender input
+          {'title': _('Gender'), 'type': 'gender',
+         'setting_key': 'gender', 'options': [_("Average"), _("Female"), _("Male")],
+         'tooltip': _('Affects healthy/unhealthy thresholds for Waist to Hip ratio')},
+          # Age input
+          {'title': _('Age'), 'type': 'time',
+         'setting_key': 'age', 'min': 18, 'max': 123,
+         'tooltip': _('Affects healthy/unhealthy thresholds for Waist to Height ratio')},
+          # Waist circumference
+          {'title': _('Waist'), 'type': 'distance',
+         'setting_key': 'waist', 'min': 25, 'max': 800,
+         'tooltip': _('Affects Waist to Height ratio, Waist to Hip ratio and BRI')},
+          # Hip circumference
+          {'title': _('Hip'), 'type': 'distance',
+          'setting_key': 'hip', 'min': 25, 'max': 800,
+          'tooltip': _('Affects Waist to Hip ratio')},
+        ]
+        self.add_inputs_to_group(advanced_inputs, self.advanced_inputs_group)
+        self.inputs = self.inputs + advanced_inputs
 
         # Arrow icon
         self.icon = Gtk.Image(icon_name="go-next-symbolic", pixel_size=32)
@@ -176,93 +184,159 @@ class BmiWindow(Adw.ApplicationWindow):
         # Advanced results group
         self.right_group = Adw.PreferencesGroup(title=_("Results"))
         self.right_page.add(self.right_group)
-        # Result rows
-        self.create_result_row("result_bmi_row", "BMI", _("Body Mass Index"))
+
+        self.create_result_row("result_bmi_row", _("BMI"), _("Body Mass Index"))
         self.create_result_row("result_waist_to_height_row", _("Waist / Height"), _("Waist to height ratio"))
         self.create_result_row("result_waist_to_hip_row", _("Waist / Hip"), _("Waist to hip ratio"))
         self.create_result_row("result_bri_row", _("BRI"), _("Body Roundness Index"))
+        # Results
+        # results = {
+        # 'bmi_basic': {
+        #     'widget': self.result_feedback_label,
+        #     'label':  self.bmi_button,
+        #     'value':  int(round(self.bmi, 0)),
+        #     'thresholds': [
+        #       {'text': _('Underweight'),     'value': 0,    'style': 'light-blue'},
+        #       {'text': _('Healthy'),         'value': 18.5, 'style': 'success'},
+        #       {'text': _('Overweight'),      'value': 25,   'style': 'warning'},
+        #       {'text': _('Obese'),           'value': 30,   'style': 'error'},
+        #       {'text': _('Extremely obese'), 'value': 40,   'style': 'error'},
+        #     ]
+        #   },
+        #   'bmi': {
+        #     'widget': self.result_bmi_row,
+        #     'label': self.result_bmi_row_label,
+        #     'value':  round(self.bmi, 1),
+        #     'thresholds': [
+        #       {'text': _('Underweight [Severe]'),   'value': 0,    'style': 'light-blue'},
+        #       {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 'light-blue'},
+        #       {'text': _('Underweight [Mild]'),     'value': 17,   'style': 'light-blue'},
+        #       {'text': _('Healthy'),                'value': 18.5, 'style': 'success'},
+        #       {'text': _('Overweight'),             'value': 25,   'style': 'warning'},
+        #       {'text': _('Obese [Class 1]'),        'value': 30,   'style': 'error'},
+        #       {'text': _('Obese [Class 2]'),        'value': 35,   'style': 'error'},
+        #       {'text': _('Obese [Class 3]'),        'value': 40,   'style': 'error'},
+        #     ]
+        #   },
+        #   'whtr': {
+        #     'widget': self.result_waist_to_height_row,
+        #     'label': self.result_waist_to_height_row_label,
+        #     'value':  round(self.waist_to_height, 2),
+        #     'thresholds': [
+        #       {'text': _('Healthy'),   'value': 0,                    'style': 'success'},
+        #       {'text': _('Unhealthy'), 'value': get_whtr_unhealthy(), 'style': 'warning'},
+        #     ]
+        #   },
+        #   'whr': {
+        #     'widget': self.result_waist_to_hip_row,
+        #     'label': self.result_waist_to_hip_row_label,
+        #     'value':  round(self.waist_to_hip, 2),
+        #     'thresholds': [
+        #       {'text': _('Healthy'),    'value': 0,                      'style': 'success'},
+        #       {'text': _('Overweight'), 'value': get_whr_threshold()[0], 'style': 'warning'},
+        #       {'text': _('Obese'),      'value': get_whr_threshold()[1], 'style': 'error'},
+        #     ]
+        #   },
+        #   'bri': {
+        #     'widget': self.result_bri_row,
+        #     'label': self.result_bri_row_label,
+        #     'value':  round(self.bri, 2),
+        #     'thresholds': [
+        #       {'text': _('Very lean'),     'value': 0,    'style': 'light-blue'},
+        #       {'text': _('Lean'),          'value': 3.41, 'style': 'success'},
+        #       {'text': _('Average'),       'value': 4.45, 'style': 'success'},
+        #       {'text': _('Above average'), 'value': 5.46, 'style': 'warning'},
+        #       {'text': _('High'),          'value': 6.91, 'style': 'error'},
+        #     ]
+        #   },
+        # }
 
-        # Setting values for input rows
-        self.height_input_row.set_value(self.settings["height"])
-        self.weight_input_row.set_value(self.settings["mass"])
-        self.waist_input_row.set_value(self.settings["waist"])
-        self.hip_input_row.set_value(self.settings["hip"])
-        self.age_input_row.set_value(self.settings["age"])
-
-        # Connecting input rows
-        self.distance_rows = [self.height_input_row, self.waist_input_row, self.hip_input_row]
-        self.mass_rows = [self.weight_input_row]
-        self.metrics_rows = self.distance_rows + self.mass_rows
-        for row in self.metrics_rows:
-            row.connect('changed', self.on_input_changed)
+        # Setting remembered values for input rows and connecting them
+        for item in self.inputs:
+          widget = item.get('widget')
+          key = item.get('setting_key')
+          value = self.settings[key]
+          widget.set_value(value)
+          widget.set_callback(self.update_results)
         # Updating all
-        self.update_all()
+        self.update_results()
+        self.update_mode()
         # Switching to imperial if needed
-        if self.imperial:
+        if self.units_button.get_active():
             self.on_units_button(self)
 
-    def update_all(self):
-        self.update_inputs()
-        self.update_results()
-        self.update_result_labels()
-        self.update_mode()
-        self.update_units_labels()
+    def add_inputs_to_group(self, inputs, group):
+      iteration = 0
+      for item in inputs:
+        row_type = inputs[iteration].get('type')
+        if row_type == 'weight': row = WeightRow()
+        elif row_type == 'distance': row = DistanceRow()
+        elif row_type == 'time': row = TimeRow()
+        elif row_type == 'gender':
+          options = inputs[iteration].get('options')
+          row = GenderRow(options)
+        if row_type == 'weight' or row_type == 'distance' or row_type == 'time':
+          title = inputs[iteration].get('title')
+          row.set_title(title)
+          lower = inputs[iteration].get('min')
+          upper = inputs[iteration].get('max')
+          row.set_range(lower, upper)
+        tooltip = inputs[iteration].get('tooltip')
+        row.set_tooltip(tooltip)
+        row.set_group(group)
+        inputs[iteration]['widget'] = row
+        iteration += 1
 
-    def update_inputs(self):
-        # Getting relevant values
-        self.imperial = self.units_button.get_active()
-        self.height = self.height_input_row.get_value()
-        self.mass = self.weight_input_row.get_value()
-        self.waist = self.waist_input_row.get_value()
-        self.hip = self.hip_input_row.get_value()
-        self.gender = self.gender_adjustment.get_selected_item().get_string()
-        self.age = self.age_input_row.get_value()
-        # Converting imperial to metric
-        if self.imperial:
-            self.height = self.in_to_cm(self.height)
-            self.mass = self.lb_to_kg(self.mass)
-            self.waist = self.in_to_cm(self.waist)
-            self.hip = self.in_to_cm(self.hip)
+    def get_input(self, metric: str):
+      for item in self.inputs:
+        key = item.get('setting_key')
+        if key == metric:
+          widget = item.get('widget')
+          value = widget.get_value()
+          return value
+      print(f"No such input as '{metric}'")
+      exit(-1)
 
-        self.height_input_row.set_title(_("Height"))
-        self.weight_input_row.set_title(_("Weight"))
-        if self.height == 267:
-            self.height_input_row.set_title("Robert Wadlow")
-        if self.mass == 650:
-            self.weight_input_row.set_title("Jon Brower Minnoch")
+    def set_imperial(self, imperial: bool):
+      for item in self.inputs:
+        widget = item.get('widget')
+        if imperial:
+          widget.set_imperial(True)
+        else:
+          widget.set_imperial(False)
 
+    # Called after value of an input row changes
     def update_results(self):
-        # Calculating BMI
-        self.bmi = self.mass / ((self.height / 100) ** 2)
-        # Calculating Waist to Height ratio
-        self.waist_to_height = self.waist / self.height
-        # Calculating Waist to Hip ratio
-        self.waist_to_hip = self.waist / self.hip
-        # Calculating BRI
-        try:
-            self.bri = 364.2 - (365.5 * math.sqrt((1 - (self.waist / (math.pi * self.height)) ** 2)))
-        except:
-            self.bri = 0
-        # Sometimes '1 - (self.waist / (math.pi * self.height)' < 0 so sqrt() errors out
+      height = self.get_input('height')
+      mass = self.get_input('mass')
+      waist = self.get_input('waist')
+      hip = self.get_input('hip')
+      # Calculating BMI
+      self.bmi = mass / ((height / 100) ** 2)
+      # Calculating Waist to Height ratio
+      self.waist_to_height = waist / height
+      # Calculating Waist to Hip ratio
+      self.waist_to_hip = waist / hip
+      # Calculating BRI
+      try:
+        self.bri = 364.2 - (365.5 * math.sqrt((1 - (waist / (math.pi * height)) ** 2)))
+      except ValueError:
+        self.bri = 0
+      # Sometimes '1 - (self.waist / (math.pi * height)' < 0 so sqrt() errors out
+      self.update_result_labels()
 
     # Hides or shows simple and advanced input and output widgets depending on the selected mode
     def update_mode(self):
-        if self.mode_dropdown.get_selected() == 0:
-            self.advanced_inputs_page.set_visible(False)
-            self.right_page.set_visible(False)
-            self.right_box.set_visible(True)
-            self.inputs_group.set_title("")
-        else:
-            self.advanced_inputs_page.set_visible(True)
-            self.right_page.set_visible(True)
-            self.right_box.set_visible(False)
-            self.inputs_group.set_title(_("Inputs"))
-
-    # Action, called after value of self.height_input_row or other inputs changes
-    def on_input_changed(self, _scroll):
-        self.update_inputs()
-        self.update_results()
-        self.update_result_labels()
+      if self.mode_dropdown.get_selected() == 0:
+        self.advanced_inputs_page.set_visible(False)
+        self.right_page.set_visible(False)
+        self.right_box.set_visible(True)
+        self.inputs_group.set_title("")
+      else:
+        self.advanced_inputs_page.set_visible(True)
+        self.right_page.set_visible(True)
+        self.right_box.set_visible(False)
+        self.inputs_group.set_title(_("Inputs"))
 
     # Action, called after value of self.mode_dropdown changes
     def on_dropdown_value_changed(self, dropdown, _pspec):
@@ -271,37 +345,21 @@ class BmiWindow(Adw.ApplicationWindow):
 
     # Called by self.units_button
     def on_units_button(self, _button):
-        self.update_inputs()
         self.convert_inputs()
-        self.update_units_labels()
         self.update_results()
         self.update_result_labels()
-
-    # Changes input rows' subtitles to cm/kg or in/ft
-    def update_units_labels(self):
-        # Setting vars
-        if self.imperial is False:
-            distance = _("Centimetres")
-            mass = _("Kilograms")
-        else:
-            distance = _("Inches")
-            mass = _("Pounds")
-        # Setting subtitles
-        for row in self.distance_rows:
-            row.set_subtitle(distance)
-        for row in self.mass_rows:
-            row.set_subtitle(mass)
+        self.set_imperial(self.units_button.get_active())
 
     # Converting row adjustment limits and values
     def convert_inputs(self):
         # Helper functions
         def row_get_limits(row):
             return [row.get_adjustment().get_lower(), row.get_adjustment().get_upper()]
-        def row_set_limits(row, limits):
+        def row_set_range(row, limits):
             row.get_adjustment().set_lower(limits[0])
             row.get_adjustment().set_upper(limits[1])
         # Defining conversions
-        if self.imperial is False:
+        if self.units_button.get_active() is False:
             convert_distance = self.in_to_cm
             convert_mass = self.lb_to_kg
         else:
@@ -311,31 +369,27 @@ class BmiWindow(Adw.ApplicationWindow):
         for row in self.distance_rows:
             limits = row_get_limits(row)
             for i in range(len(limits)): limits[i] = round(convert_distance(limits[i]), 1)
-            row_set_limits(row, limits)
+            row_set_range(row, limits)
             row.set_value(convert_distance(round(row.get_value(), 1)))
-        for row in self.mass_rows:
-            limits = row_get_limits(row)
-            for i in range(len(limits)): limits[i] = round(convert_mass(limits[i]), 1)
-            row_set_limits(row, limits)
-            row.set_value(convert_mass(round(row.get_value(), 1)))
 
-    def get_results(self):
+    def get_thresholds(self):
+        age = self.get_input('age')
+        gender = self.get_input('gender')
         # Getting dynamic values
         def get_whtr_unhealthy():
-            if self.age > 40:   return ((self.age-40)/100)+0.5
-            elif self.age > 50: return 0.6
-            else:               return 0.5
-        def get_whr_overweight():
-            if self.gender == "Female": return 0.8
-            elif self.gender == "Male": return 0.9
-            else:                       return 0.85
-        def get_whr_obese():
-          if self.gender == "Female": return 0.85
-          elif self.gender == "Male": return 1
-          else:                       return 0.925
+          if age > 40:   return ((age-40)/100)+0.5
+          elif age > 50: return 0.6
+          else:          return 0.5
+        def get_whr_threshold():
+          if gender == 0:   return [0.85, 0.925]
+          if gender == 1:   return [0.8, 0.85]
+          elif gender == 2: return [0.9, 1]
+          else:
+            print('Unhandled gender value.')
+            exit(-1)
         # Returning results
         return {
-          'basic_bmi': {
+          'bmi_basic': {
             'widget': self.result_feedback_label,
             'label':  self.bmi_button,
             'value':  int(round(self.bmi, 0)),
@@ -376,9 +430,9 @@ class BmiWindow(Adw.ApplicationWindow):
             'label': self.result_waist_to_hip_row_label,
             'value':  round(self.waist_to_hip, 2),
             'thresholds': [
-              {'text': _('Healthy'),    'value': 0,                    'style': 'success'},
-              {'text': _('Overweight'), 'value': get_whr_overweight(), 'style': 'warning'},
-              {'text': _('Obese'),      'value': get_whr_obese(),      'style': 'error'},
+              {'text': _('Healthy'),    'value': 0,                      'style': 'success'},
+              {'text': _('Overweight'), 'value': get_whr_threshold()[0], 'style': 'warning'},
+              {'text': _('Obese'),      'value': get_whr_threshold()[1], 'style': 'error'},
             ]
           },
           'bri': {
@@ -401,7 +455,13 @@ class BmiWindow(Adw.ApplicationWindow):
             widget.remove_css_class("success")
             widget.remove_css_class("warning")
             widget.remove_css_class("error")
-        results = self.get_results()
+        results = self.get_thresholds()
+        # bmi = results.get('bmi').get('thresholds')
+        # for item in bmi:
+        #   val = item.get('value')
+        #   uhuh = val * ((self.height / 100) ** 2)
+        #   uhuh = round(uhuh, 1)
+        #   print( uhuh )
         for item in results:
           widget = results.get(item).get('widget')
           label = results.get(item).get('label')
@@ -447,7 +507,6 @@ class BmiWindow(Adw.ApplicationWindow):
         self.widget.set_tooltip_text(tooltip)
         self.widget.add_css_class("heading")
         self.label.set_css_classes(["title-3"])
-        # self.label.set_label("21")
         self.widget.add_suffix(self.label)
         self.right_group.add(self.widget)
 
@@ -500,13 +559,11 @@ class BmiWindow(Adw.ApplicationWindow):
         self.settings["forget"] = self.forget_button.get_active()
         self.settings["imperial"] = self.units_button.get_active()
         # Body metrics
-        self.settings["height"] = round(self.height, 0)
-        self.settings["mass"] = round(self.mass, 0)
-        self.settings["waist"] = round(self.waist, 0)
-        self.settings["hip"] = round(self.hip, 0)
+        for item in self.inputs:
+          key = item.get('setting_key')
+          value = item.get('widget').get_value()
+          self.settings[key] = value
         # Age and gender
-        self.settings["age"] = self.age_input_row.get_value()
-        self.settings["gender"] = self.gender_adjustment.get_selected()
         # Resets adjustments if forget button is active
         body_metrics=["height", "mass", "gender", "age", "waist", "hip"]
         if self.settings["forget"] is True:
