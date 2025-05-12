@@ -385,11 +385,12 @@ class BmiWindow(Adw.ApplicationWindow):
 
     # Show the About app dialog
     def show_about(self, _button):
-        self.about = Adw.AboutWindow(
+        self.about = Adw.AboutDialog(
         application_name = 'BMI',
         application_icon = 'io.github.philippkosarev.bmi',
         developer_name   = 'Philipp Kosarev',
         version          = 'v3.0',
+        translator_credits = _('Sultaniiazov David https://github.com/x1z53'),
         developers       = ['Philipp Kosarev'],
         artists          = ['Philipp Kosarev'],
         copyright        = '© 2024 Philipp Kosarev',

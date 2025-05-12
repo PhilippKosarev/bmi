@@ -5,3 +5,4 @@ data/io.github.philippkosarev.bmi.metainfo.xml.in
 data/io.github.philippkosarev.bmi.gschema.xml
 src/main.py
 src/window.py
+src/bmi_widgets.py
