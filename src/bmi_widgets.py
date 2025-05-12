@@ -1,10 +1,10 @@
 from gi.repository import Gtk, Adw, Gdk
 
 # Helper functions
-def in_to_cm(value): value *= 2.54; return value
-def cm_to_in(value): value *= 1 / 2.54; return value
-def kg_to_lb(value): value *= 2.204623; return value
-def lb_to_kg(value): value *= 0.4535924; return value
+def in_to_cm(value): return value * 2.54
+def cm_to_in(value): return value * 1 / in_to_cm(1)
+def kg_to_lb(value): return value * 2.2046226218
+def lb_to_kg(value): return value * 1 / kg_to_lb(1)
 
 class InputRow:
   def __init__(self):
@@ -87,6 +87,9 @@ class DistanceRow(InputRow):
     self.update_range()
     self.set_value(value)
 
+  def get_name(self):
+    return self.__class__.__name__
+
 
 # Weight input row (kg/lb)
 class WeightRow(InputRow):
@@ -130,6 +133,9 @@ class WeightRow(InputRow):
     self.update_range()
     self.set_value(value)
 
+  def get_name(self):
+    return self.__class__.__name__
+
 
 # Time input row (years)
 class TimeRow(InputRow):
@@ -146,6 +152,8 @@ class TimeRow(InputRow):
   def set_range(self, lower, upper):
     self.row.set_range(lower, upper)
 
+  def get_name(self):
+    return self.__class__.__name__
 
 # Gender input row
 class GenderRow():
@@ -178,8 +186,94 @@ class GenderRow():
   def set_tooltip(self, tooltip: str):
     self.row.set_tooltip_text(tooltip)
 
+  def get_name(self):
+    return self.__class__.__name__
+
 
 clipboard = Gdk.Display.get_default().get_clipboard()
+class BasicResult:
+  def __init__(self):
+    # Box
+    self.box = Gtk.Box()
+    self.box.set_spacing(6)
+    self.box.set_orientation(Gtk.Orientation.VERTICAL)
+    self.box.set_valign(Gtk.Align.CENTER)
+    self.box.set_size_request(190, 0)
+    self.box.set_margin_start(8)
+    self.box.set_margin_end(8)
+    # Title label
+    self.title_label = Gtk.Label()
+    self.title_label.add_css_class("title-2")
+    self.box.append(self.title_label)
+    # The button which shows the result
+    self.button = Gtk.Button(halign=Gtk.Align.CENTER)
+    self.button.set_tooltip_text(_("Copy result"))
+    self.button.set_css_classes(["pill", "title-1"])
+    self.button.connect('clicked', self.copy_result)
+    self.button.set_size_request(110, 0)
+    self.box.append(self.button)
+    # Feedback label
+    self.feedback_label = Gtk.Label()
+    self.feedback_label.add_css_class("title-2")
+    self.box.append(self.feedback_label)
+
+  def copy_result(self, widget):
+    value = widget.get_label()
+    print(f"Copied result '{value}'")
+    Gdk.Clipboard.set(clipboard, value);
+    # Creating and showing a toast
+    if self.toast_overlay is not None:
+      self.toast = Adw.Toast(title=_("Result copied"), timeout=1)
+      self.toast_overlay.add_toast(self.toast)
+
+  def get_name(self):
+    return self.__class__.__name__
+
+  def get_toast_overlay(self):
+    widget = self.box.get_parent()
+    while True:
+      name = widget.get_name()
+      if name == 'AdwToastOverlay':
+        return widget
+      try:
+        widget = widget.get_parent()
+      except:
+        print("No toast overlay found.")
+
+  def set_title(self, title: str):
+    self.title_label.set_label(title)
+
+  def set_feedback(self, feedback: str):
+    self.feedback_label.set_label(feedback)
+
+  def set_result(self, result: str, digits):
+    if digits == 0:
+      result = int(round(result, 0))
+    else:
+      result = round(result, digits)
+    self.button.set_label(str(result))
+
+  def set_tooltip(self, tooltip: str):
+    self.button.set_tooltip_text(tooltip)
+
+  def set_style(self, style: int):
+    self.feedback_label.remove_css_class("light-blue")
+    self.feedback_label.remove_css_class("success")
+    self.feedback_label.remove_css_class("warning")
+    self.feedback_label.remove_css_class("error")
+    if style == 0: self.feedback_label.add_css_class('light-blue')
+    elif style == 1: self.feedback_label.add_css_class('success')
+    elif style == 2: self.feedback_label.add_css_class('warning')
+    elif style == 3: self.feedback_label.add_css_class('error')
+
+  def set_parent(self, parent):
+    parent_name = parent.get_name()
+    if parent_name == 'GtkBox':
+      parent.append(self.box)
+    else:
+      parent.set_child(self.box)
+    self.toast_overlay = self.get_toast_overlay()
+
 class ResultRow:
   def __init__(self):
     self.row = Adw.ActionRow()
@@ -208,8 +302,8 @@ class ResultRow:
     if self.function is not None:
       exec(self.function)
 
-  def get_label(self):
-    return self.label
+  def get_name(self):
+    return self.__class__.__name__
 
   def get_toast_overlay(self):
     widget = self.row.get_parent()
@@ -221,9 +315,17 @@ class ResultRow:
         widget = widget.get_parent()
       except:
         print("No toast overlay found.")
+        return None
 
   def set_title(self, title: str):
     self.row.set_title(title)
+
+  def set_feedback(self, subtitle: str):
+    self.row.set_subtitle(subtitle)
+
+  def set_result(self, result: str, digits: int):
+    result = round(result, digits)
+    self.label.set_label(str(result))
 
   def set_tooltip(self, tooltip: str):
     self.row.set_tooltip_text(tooltip)
@@ -233,14 +335,17 @@ class ResultRow:
     self.row.remove_css_class("success")
     self.row.remove_css_class("warning")
     self.row.remove_css_class("error")
-    if style == 0: self.row.add_css_class('light-blue')
+    if style == 0:   self.row.add_css_class('light-blue')
     elif style == 1: self.row.add_css_class('success')
     elif style == 2: self.row.add_css_class('warning')
     elif style == 3: self.row.add_css_class('error')
+    else:
+      print(f"Unhandled style '{style}'")
+      exit(-1)
 
   def set_callback(self, function):
     self.function = function
 
-  def set_group(self, group):
+  def set_parent(self, group):
     group.add(self.row)
     self.toast_overlay = self.get_toast_overlay()
