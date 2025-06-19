@@ -24,13 +24,12 @@ import math
 from .bmi_widgets import *
 
 # Shorthand vars
-app_id = "io.github.philippkosarev.bmi"
-# Alignment
+## Alignment
 start = Gtk.Align.START
 end = Gtk.Align.END
 center = Gtk.Align.CENTER
 fill = Gtk.Align.FILL
-# Orientations
+## Orientations
 horizontal = Gtk.Orientation.HORIZONTAL
 vertical = Gtk.Orientation.VERTICAL
 
@@ -39,7 +38,7 @@ class BmiWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         # Loading GSettings and connecting action after closing the app window
-        self.settings = Gio.Settings.new_with_path(app_id, "/io/github/philippkosarev/bmi/")
+        self.settings = Gio.Settings.new('io.github.philippkosarev.bmi')
         self.connect("close-request", self.on_close_window)
 
         # Basic window properties
@@ -386,18 +385,23 @@ class BmiWindow(Adw.ApplicationWindow):
     # Show the About app dialog
     def show_about(self, _button):
         self.about = Adw.AboutDialog(
-        application_name = 'BMI',
-        application_icon = 'io.github.philippkosarev.bmi',
-        developer_name   = 'Philipp Kosarev',
-        version          = 'v3.0',
-        translator_credits = _('Sultaniiazov David https://github.com/x1z53'),
-        developers       = ['Philipp Kosarev'],
-        artists          = ['Philipp Kosarev'],
-        copyright        = '© 2024 Philipp Kosarev',
-        license_type     = "GTK_LICENSE_GPL_2_0",
-        website          = "https://github.com/philippkosarev/bmi",
-        issue_url        = "https://github.com/philippkosarev/bmi/issues"
-        ); self.about.present()
+          application_name   = 'BMI',
+          application_icon   = 'io.github.philippkosarev.bmi',
+          version            = 'v3.0',
+          developer_name     = 'Philipp Kosarev',
+          developers         = ['Philipp Kosarev'],
+          artists            = ['Philipp Kosarev'],
+          copyright          = '© 2024 Philipp Kosarev',
+          license_type       = 'GTK_LICENSE_GPL_2_0',
+          website            = "https://github.com/philippkosarev/bmi",
+          issue_url          = "https://github.com/philippkosarev/bmi/issues",
+        )
+        self.about.add_credit_section(_("Translators"), [
+            "Sultaniiazov David https://github.com/x1z53",
+            "Maksym Dilanian https://github.com/maksym-dilanian",
+          ]
+        )
+        self.about.present(self)
 
     # Action after closing the app window
     def on_close_window(self, widget, *args):
