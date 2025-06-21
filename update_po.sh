@@ -1,7 +1,6 @@
 #!/bin/bash
 
 echo "Updating pot file."
-command
 xgettext --files-from=po/POTFILES.in \
   --output=po/bmi.pot \
   --join-existing \

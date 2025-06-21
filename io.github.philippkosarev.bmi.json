@@ -5,10 +5,10 @@
     "sdk" : "org.gnome.Sdk",
     "command" : "bmi",
     "finish-args" : [
-        "--share=ipc",
+        "--socket=wayland"
         "--socket=fallback-x11",
         "--device=dri",
-        "--socket=wayland"
+        "--share=ipc",
     ],
     "cleanup" : [
         "/include",

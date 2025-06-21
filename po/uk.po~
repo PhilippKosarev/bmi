@@ -18,9 +18,10 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#. Basic window properties
 #: data/io.github.philippkosarev.bmi.desktop.in:2
 #: data/io.github.philippkosarev.bmi.metainfo.xml.in:7 src/window.py:211
-#: src/window.py:228
+#: src/window.py:228 src/window.blp:6 src/window.blp:38
 msgid "BMI"
 msgstr "ІМТ"
 
@@ -120,24 +121,27 @@ msgid "Forget input values after closing"
 msgstr "Забути введені значення після закриття"
 
 #: src/window.py:104 src/window.py:260 src/window.py:259 src/window.py:105
-#: src/window.py:369
+#: src/window.py:369 src/window.blp:30
 msgid "Inputs"
 msgstr "Введення"
 
+#. Height input
 #: src/window.py:108 src/window.py:228 src/window.py:227 src/window.py:110
 #: src/window.py:66
 msgid "Height"
 msgstr "Висота"
 
+#. Weight input
 #: src/window.py:111 src/window.py:229 src/window.py:228 src/window.py:114
 #: src/window.py:70
 msgid "Weight"
 msgstr "Вага"
 
-#: src/window.py:120 src/window.py:128
+#: src/window.py:120 src/window.py:128 src/window.blp:33
 msgid "Advanced inputs"
 msgstr "Розширені введення"
 
+#. Gender input
 #: src/window.py:123 src/window.py:133 src/bmi_widgets.py:162 src/window.py:79
 #: src/widgets/gender_row.py:14
 msgid "Gender"
@@ -160,6 +164,7 @@ msgstr "Жінка"
 msgid "Male"
 msgstr "Чоловік"
 
+#. Age input
 #: src/window.py:135 src/window.py:137 src/window.py:83
 msgid "Age"
 msgstr "Вік"
@@ -168,6 +173,7 @@ msgstr "Вік"
 msgid "Affects healthy/unhealthy thresholds for Waist to Height ratio"
 msgstr "Впливає на здорові/нездорові пороги співвідношення талії до зросту"
 
+#. Waist circumference
 #: src/window.py:139 src/window.py:141 src/window.py:87
 msgid "Waist"
 msgstr "Талія"
@@ -178,6 +184,7 @@ msgstr ""
 "Впливає на співвідношення талії до зросту, співвідношення талії до стегон та "
 "ІОТ"
 
+#. Hip circumference
 #: src/window.py:142 src/window.py:145 src/window.py:91
 msgid "Hip"
 msgstr "Стегно"
@@ -194,7 +201,7 @@ msgstr "ІМТ:"
 msgid "Copy BMI"
 msgstr "Скопіювати ІМТ"
 
-#: src/window.py:177 src/window.py:170
+#: src/window.py:177 src/window.py:170 src/window.blp:36
 msgid "Results"
 msgstr "Результати"
 
@@ -202,27 +209,27 @@ msgstr "Результати"
 msgid "Body Mass Index"
 msgstr "Індекс Маси Тіла"
 
-#: src/window.py:181 src/window.py:243
+#: src/window.py:181 src/window.py:243 src/window.blp:42
 msgid "Waist / Height"
 msgstr "Талія / Зріст"
 
-#: src/window.py:181 src/window.py:244
+#: src/window.py:181 src/window.py:244 src/window.blp:43
 msgid "Waist to height ratio"
 msgstr "Співвідношення талії до зросту"
 
-#: src/window.py:182 src/window.py:252
+#: src/window.py:182 src/window.py:252 src/window.blp:46
 msgid "Waist / Hip"
 msgstr "Талія / Стегна"
 
-#: src/window.py:182 src/window.py:253
+#: src/window.py:182 src/window.py:253 src/window.blp:47
 msgid "Waist to hip ratio"
 msgstr "Співвідношення талії до стегон"
 
-#: src/window.py:183 src/window.py:262
+#: src/window.py:183 src/window.py:262 src/window.blp:50
 msgid "BRI"
 msgstr "ІОТ"
 
-#: src/window.py:183 src/window.py:263
+#: src/window.py:183 src/window.py:263 src/window.blp:39 src/window.blp:51
 msgid "Body Roundness Index"
 msgstr "Індекс Округлості Тіла"
 
@@ -360,9 +367,41 @@ msgid "Toggles Advanced Mode"
 msgstr "Вмикає/вимикає розширений режим"
 
 #: data/io.github.philippkosarev.bmi.gschema.xml:14
+#: src/preferences/preferences.blp:29
 msgid "Remember inputs"
 msgstr ""
 
 #: src/main.py:68
 msgid "Translators"
+msgstr ""
+
+#: src/window.blp:62 src/preferences/preferences.blp:8
+msgid "Preferences"
+msgstr ""
+
+#: src/window.blp:66
+#, fuzzy
+msgid "About BMI"
+msgstr "Впливає на ІМТ"
+
+#: src/preferences/preferences.blp:10
+#, fuzzy
+msgid "Input"
+msgstr "Введення"
+
+#: src/preferences/preferences.blp:12
+#, fuzzy
+msgid "Advanced mode"
+msgstr "Вмикає/вимикає розширений режим"
+
+#: src/preferences/preferences.blp:19
+msgid "Measurement system"
+msgstr ""
+
+#: src/preferences/preferences.blp:21
+msgid "Metric"
+msgstr ""
+
+#: src/preferences/preferences.blp:21
+msgid "Imperial"
 msgstr ""
