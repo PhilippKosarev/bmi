@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gresources>
   <gresource prefix="/io/github/philippkosarev/bmi">
+
+    <!-- UI files -->
+    <file>window.ui</file>
+    <file>preferences/preferences.ui</file>
+    <!-- CSS -->
     <file>style.css</file>
+    <!-- Icons -->
     <file>icons/scalable/actions/ruler-angled-symbolic.svg</file>
+
   </gresource>
 </gresources>

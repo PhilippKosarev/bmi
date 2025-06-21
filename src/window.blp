@@ -1,0 +1,69 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $BmiWindow: Adw.ApplicationWindow {
+  // Basic window properties
+  title: _("BMI");
+  width-request: 300;
+  height-request: 380;
+  // Content
+  [content]
+  Adw.ToolbarView {
+    // Header
+    [top]
+    Adw.HeaderBar {
+      [end]
+      MenuButton {
+        icon-name: "open-menu-symbolic";
+        menu-model: primary_menu;
+        primary: true;
+      }
+    }
+    // Content
+    content: Adw.ToastOverlay toast_overlay {
+      Box {
+        orientation: vertical;
+        margin-start: 3;
+        margin-end: 3;
+        Adw.PreferencesPage {
+          Adw.PreferencesGroup basic_inputs_group {
+            title: _("Inputs");
+          }
+          Adw.PreferencesGroup advanced_inputs_group {
+            title: _("Advanced inputs");
+          }
+          Adw.PreferencesGroup results_group {
+            title: _("Results");
+            $ResultRow bmi_result_row {
+              title: _("BMI");
+              tooltip-text: _("Body Roundness Index");
+            }
+            $ResultRow whtr_result_row {
+              title: _("Waist / Height");
+              tooltip-text: _("Waist to height ratio");
+            }
+            $ResultRow whr_result_row {
+              title: _("Waist / Hip");
+              tooltip-text: _("Waist to hip ratio");
+            }
+            $ResultRow bri_result_row {
+              title: _("BRI");
+              tooltip-text: _("Body Roundness Index");
+            }
+          }
+        }
+      }
+    };
+  }
+}
+
+menu primary_menu {
+  item {
+    label: _("Preferences");
+    action: "app.preferences";
+  }
+  item {
+    label: _("About BMI");
+    action: "app.about";
+  }
+}

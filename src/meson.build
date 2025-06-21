@@ -2,11 +2,21 @@ pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
 moduledir = pkgdatadir / 'bmi'
 gnome = import('gnome')
 
+blueprints = custom_target('blueprints',
+  input: files(
+    'window.blp',
+    'preferences/preferences.blp',
+  ),
+  output: '.',
+  command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
+)
+
 gnome.compile_resources('bmi',
   'bmi.gresource.xml',
   gresource_bundle: true,
   install: true,
   install_dir: pkgdatadir,
+  dependencies: blueprints,
 )
 
 python = import('python')
@@ -30,7 +40,16 @@ bmi_sources = [
   '__init__.py',
   'main.py',
   'window.py',
-  'bmi_widgets.py',
+  'calculator.py',
+  # Preferences
+  'preferences/preferences.py',
+  'preferences/preferences_switch.py',
+  # Widgets
+  'widgets/distance_row.py',
+  'widgets/mass_row.py',
+  'widgets/time_row.py',
+  'widgets/gender_row.py',
+  'widgets/result_row.py',
 ]
 
 install_data(bmi_sources, install_dir: moduledir)

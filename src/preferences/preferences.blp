@@ -1,0 +1,37 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $BmiPreferences: Adw.PreferencesWindow {
+  default-width: 370;
+  default-height: 450;
+  Adw.PreferencesPage {
+    title: _("Preferences");
+    Adw.PreferencesGroup {
+      title: _("Input");
+      $PreferencesSwitch advanced_mode_row {
+        title: _("Advanced mode");
+        [prefix]
+        Image {
+          icon-name: "accessories-calculator-symbolic";
+        }
+      }
+      Adw.ComboRow measurement_system_row {
+        title: _("Measurement system");
+        model: StringList {
+          strings [_("Metric"), _("Imperial")]
+        };
+        [prefix]
+        Image {
+          icon-name: "ruler-angled-symbolic";
+        }
+      }
+      $PreferencesSwitch remember_inputs_row {
+        title: _("Remember inputs");
+        [prefix]
+        Image {
+          icon-name: "user-bookmarks-symbolic";
+        }
+      }
+    }
+  }
+}

@@ -1,8 +1,17 @@
 # List of source files containing translatable strings.
 # Please keep this file sorted alphabetically.
+
 data/io.github.philippkosarev.bmi.desktop.in
 data/io.github.philippkosarev.bmi.metainfo.xml.in
 data/io.github.philippkosarev.bmi.gschema.xml
+
 src/main.py
 src/window.py
-src/bmi_widgets.py
+src/window.blp
+src/preferences/preferences.blp
+
+src/widgets/distance _row.py
+src/widgets/mass_row.py
+src/widgets/time_row.py
+src/widgets/gender_row.py
+src/widgets/result_row.py

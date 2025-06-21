@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="bmi">
 	<schema id="io.github.philippkosarev.bmi" path="/io/github/philippkosarev/bmi/">
-	  <key name="forget" type="b">
-		  <default>false</default>
-		  <summary>Forget height and weight on quit</summary>
+	  <key name="window-size" type="(ii)">
+		  <default>(360, 380)</default>
+		  <summary>Window size</summary>
 	  </key>
-	  <key name="imperial" type="b">
+	  <key name="advanced-mode" type="b">
 		  <default>false</default>
+		  <summary>Toggles Advanced Mode</summary>
+	  </key>
+	  <key name="remember-inputs" type="b">
+		  <default>true</default>
+		  <summary>Remember inputs</summary>
+	  </key>
+	  <key name="measurement-system" type="i">
+		  <default>0</default>
 		  <summary>Whether the app uses metric or imperial units</summary>
 	  </key>
 	  <key name="height" type="d">
@@ -14,12 +22,8 @@
 		  <summary>Height in centimetres or inches</summary>
 	  </key>
 	  <key name="mass" type="d">
-		  <default>68</default>
+		  <default>65</default>
 		  <summary>Weight in kilograms or pounds</summary>
-	  </key>
-	  <key name="mode" type="i">
-		  <default>0</default>
-		  <summary>Toggles Advanced mode</summary>
 	  </key>
 	  <key name="age" type="i">
 		  <default>30</default>
