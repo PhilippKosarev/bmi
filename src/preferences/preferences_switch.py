@@ -1,7 +1,7 @@
 # Imports
 from gi.repository import Gtk, Adw, Gio
 
-# Shorthands
+# Shorthands vars
 center = Gtk.Align.CENTER
 
 class PreferencesSwitch(Adw.ActionRow):
@@ -28,7 +28,6 @@ class PreferencesSwitch(Adw.ActionRow):
       active = self.get_active()
       if (self.settings is not None) and (self.key is not None):
         success = self.settings.set_boolean(self.key, active)
-        print(f"Setting '{self.key}' to '{active}'. Successful: {success}")
         if success is False:
           value = self.settings.get_boolean(self.key)
           self.set_active(value)

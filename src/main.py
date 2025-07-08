@@ -54,8 +54,8 @@ class BmiApplication(Adw.Application):
       version            = 'v3.0',
       developer_name     = 'Philipp Kosarev',
       developers         = [
-        'Philipp Kosarev' +' '+ 'https://github.com/PhilippKosarev',
-        'vikidevelop' +' '+ 'https://github.com/vikdevelop',
+        'Philipp Kosarev https://github.com/PhilippKosarev',
+        'vikdevelop https://github.com/vikdevelop',
       ],
       artists            = [
         'Philipp Kosarev https://github.com/PhilippKosarev',

@@ -34,7 +34,6 @@ class BmiPreferences(Adw.PreferencesWindow):
     def on_measurements_changed(self, row, param):
       selected = self.measurement_system_row.get_selected()
       success = self.settings.set_int('measurement-system', selected)
-      print(f"Setting 'measurement-system' to '{selected}'. Successful: {success}")
       if success is False:
         value = self.settings['measurement-system']
         self.measurement_system_row.set_selected(value)

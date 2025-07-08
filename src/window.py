@@ -35,12 +35,38 @@ from .calculator import Calculator
 calc = Calculator()
 clipboard = Gdk.Display.get_default().get_clipboard()
 
+
+def get_nth_child(parent, n):
+  child = parent.get_first_child()
+  for widget in range(n-1):
+    child = child.get_first_child()
+  return child
+
+def get_groups(page):
+  group = get_nth_child(page, 5).get_next_sibling()
+  groups = [group]
+  while True:
+    group = group.get_next_sibling()
+    if group is not None:
+      groups.append(group)
+    else:
+      return groups
+
+
 @Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window.ui')
 class BmiWindow(Adw.ApplicationWindow):
     __gtype_name__ = 'BmiWindow'
 
     # Important Widgets
     toast_overlay = Gtk.Template.Child()
+    clamp = Gtk.Template.Child()
+    ## Breakpoints
+    horizontal_breakpoint = Gtk.Template.Child()
+    vertical_breakpoint = Gtk.Template.Child()
+    ## Pages
+    first_page = Gtk.Template.Child()
+    second_page = Gtk.Template.Child()
+    third_page = Gtk.Template.Child()
     ## Groups
     basic_inputs_group = Gtk.Template.Child()
     advanced_inputs_group = Gtk.Template.Child()
@@ -152,6 +178,33 @@ class BmiWindow(Adw.ApplicationWindow):
 
       # Setting measurement system from settings
       self.set_imperial(bool(self.settings["measurement-system"]))
+
+      # Setting up adaptive ui
+      self.horizontal_breakpoint.connect('apply', self.horizontify_ui)
+      self.horizontal_breakpoint.connect('unapply', self.verticalize_ui)
+      self.vertical_breakpoint.connect('apply', self.verticalize_ui)
+
+    def horizontify_ui(self, adw_breakpoint):
+      if len(get_groups(self.first_page)) != 3:
+        return
+      self.first_page.remove(self.advanced_inputs_group)
+      self.second_page.add(self.advanced_inputs_group)
+      self.first_page.remove(self.results_group)
+      self.third_page.add(self.results_group)
+      self.clamp.set_maximum_size(1100)
+      self.second_page.set_visible(True)
+      self.third_page.set_visible(True)
+
+    def verticalize_ui(self, adw_breakpoint):
+      if len(get_groups(self.first_page)) != 1:
+        return
+      self.second_page.remove(self.advanced_inputs_group)
+      self.first_page.add(self.advanced_inputs_group)
+      self.third_page.remove(self.results_group)
+      self.first_page.add(self.results_group)
+      self.clamp.set_maximum_size(2147483647)
+      self.second_page.set_visible(False)
+      self.third_page.set_visible(False)
 
     def set_advanced_mode(self, mode: bool):
       if mode:
