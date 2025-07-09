@@ -2,7 +2,7 @@
 
 BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita.
 
-<img width='640' alt='Download on Flathub' src='screenshots/simple-dark.png'/>
+<img width='640' alt='Download on Flathub' src='screenshots/advanced-dark.png'/>
 
 <p>
 <h1>Installing</h2>
