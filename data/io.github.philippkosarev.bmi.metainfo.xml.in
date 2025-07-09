@@ -77,14 +77,15 @@
   </supports>
 
   <releases>
-    <release version="v3.0" date="2025-04-08">
-      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v3.0</url>
+    <release version="v4.0" date="2025-07-09">
+      <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v4.0</url>
       <description translate="no">
-        <p>Version 3.0</p>
+        <p>Version 4.0</p>
         <ul>
-          <li>Updated GNOME runtime to 48</li>
-          <li>Added measurement units subtitle to input rows</li>
-          <li>Added ability to switch to imperial</li>
+          <li>Added adaptive UI</li>
+          <li>Added Ukrainian translations</li>
+          <li>Added Russian translations</li>
+          <li>Improved support for the imperial system of measurement</li>
         </ul>
       </description>
     </release>

@@ -51,7 +51,7 @@ class BmiApplication(Adw.Application):
     about = Adw.AboutWindow(
       application_name   = 'BMI',
       application_icon   = 'io.github.philippkosarev.bmi',
-      version            = 'v3.0',
+      version            = 'v4.0',
       developer_name     = 'Philipp Kosarev',
       developers         = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
