@@ -1,0 +1,33 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ResultRow: Adw.ActionRow {
+  styles ["heading"]
+  width-request: 260;
+  height-request: 60;
+  activatable: true;
+  [suffix]
+  Label label {
+    styles ["title-3"]
+    label: "0.0";
+  }
+  // [suffix]
+  // Button info_button {
+  //   styles ["circular", "flat"]
+  //   valign: center;
+  //   icon-name: "help-about-symbolic";
+  // }
+}
+
+// Adw.Dialog info_dialog {
+//   title: "Info";
+//   content-width: 300;
+//   content-height: 400;
+//   Adw.ToolbarView {
+//     [top]
+//     Adw.HeaderBar {}
+//     content: Box {
+//       Adw.PreferencesPage info_page {}
+//     };
+//   }
+// }

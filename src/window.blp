@@ -5,13 +5,13 @@ template $BmiWindow: Adw.ApplicationWindow {
   // Basic window properties
   title: _("BMI");
   width-request: 300;
-  height-request: 380;
+  height-request: 240;
   // Breakpoints
-  Adw.Breakpoint horizontal_breakpoint {
-    condition ("min-width: 800sp")
+  Adw.Breakpoint simple_breakpoint {
+    condition ("min-width: 520sp and max-height: 400sp")
   }
-  Adw.Breakpoint vertical_breakpoint {
-    condition ("min-height: 800sp")
+  Adw.Breakpoint advanced_breakpoint {
+    condition ("min-width: 800sp and max-height: 800sp")
   }
   // Content
   [content]
@@ -28,46 +28,48 @@ template $BmiWindow: Adw.ApplicationWindow {
     }
     // Content
     content: Adw.ToastOverlay toast_overlay {
-      Adw.Clamp clamp {
-        Box {
-          margin-start: 3;
-          margin-end: 3;
-          spacing: 6;
-          Adw.PreferencesPage first_page {
-            Adw.PreferencesGroup basic_inputs_group {
-              width-request: 230;
-              title: _("Inputs");
-            }
-            Adw.PreferencesGroup advanced_inputs_group {
-              width-request: 225;
-              title: _("Advanced inputs");
-            }
-            Adw.PreferencesGroup results_group {
-              width-request: 230;
-              title: _("Results");
-              $ResultRow bmi_result_row {
-                title: _("BMI");
-                tooltip-text: _("Body Mass Index");
-              }
-              $ResultRow whtr_result_row {
-                title: _("Waist / Height");
-                tooltip-text: _("Waist to height ratio");
-              }
-              $ResultRow whr_result_row {
-                title: _("Waist / Hip");
-                tooltip-text: _("Waist to hip ratio");
-              }
-              $ResultRow bri_result_row {
-                title: _("BRI");
-                tooltip-text: _("Body Roundness Index");
+      ScrolledWindow {
+        Adw.Clamp clamp {
+          maximum-size: 1100;
+          Box orientable_box {
+            orientation: vertical;
+            margin-start: 20;
+            margin-end: 20;
+            margin-bottom: 20;
+            Adw.Clamp basic_inputs_clamp {
+              maximum-size: 400;
+              Adw.PreferencesGroup basic_inputs_group {
+                title: _("Inputs");
               }
             }
-          }
-          Adw.PreferencesPage second_page {
-            visible: false;
-          }
-          Adw.PreferencesPage third_page {
-            visible: false;
+            Adw.Clamp advanced_inputs_clamp {
+              maximum-size: 400;
+              Adw.PreferencesGroup advanced_inputs_group {
+                title: _("Advanced inputs");
+              }
+            }
+            Adw.Clamp results_clamp {
+              maximum-size: 400;
+              Adw.PreferencesGroup results_group {
+                title: _("Results");
+                $ResultRow bmi_result_row {
+                  title: _("BMI");
+                  tooltip-text: _("Body Mass Index");
+                }
+                $ResultRow whtr_result_row {
+                  title: _("Waist / Height");
+                  tooltip-text: _("Waist to height ratio");
+                }
+                $ResultRow whr_result_row {
+                  title: _("Waist / Hip");
+                  tooltip-text: _("Waist to hip ratio");
+                }
+                $ResultRow bri_result_row {
+                  title: _("BRI");
+                  tooltip-text: _("Body Roundness Index");
+                }
+              }
+            }
           }
         }
       }

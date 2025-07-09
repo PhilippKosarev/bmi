@@ -5,6 +5,7 @@
     <!-- UI files -->
     <file>window.ui</file>
     <file>preferences/preferences.ui</file>
+    <file>widgets/result_row.ui</file>
     <!-- CSS -->
     <file>style.css</file>
     <!-- Icons -->

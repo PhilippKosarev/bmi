@@ -1,27 +1,39 @@
+# Imports
 from gi.repository import Gtk, Adw
 
+@Gtk.Template(resource_path='/io/github/philippkosarev/bmi/widgets/result_row.ui')
 class ResultRow(Adw.ActionRow):
   __gtype_name__ = 'ResultRow'
 
+  # Important widgets
+  label = Gtk.Template.Child()
+  # info_button = Gtk.Template.Child()
+  # info_dialog = Gtk.Template.Child()
+  # info_page = Gtk.Template.Child()
+
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    # Configuring row
-    self.label = Gtk.Label(label='0.0')
-    self.label.set_css_classes(["title-3"])
-    self.add_suffix(self.label)
-    self.add_css_class("heading")
     self.set_style(0)
-    self.set_activatable(True)
     self.connect("activated", self.on_row_clicked)
-    # Object values
+    # self.info_button.connect('clicked', self.on_info_button)
     self.callback = None
 
   def set_feedback(self, subtitle: str):
     self.set_subtitle(subtitle)
 
-  def set_result(self, result: str, digits: int):
+  def set_result(self, result: str, digits: int, inputs: dict, thresholds: dict):
     result = round(result, digits)
     self.label.set_label(str(result))
+    # Setting feedback result
+    for threshold in thresholds:
+      threshold_value = threshold.get('value')
+      if callable(threshold_value):
+        threshold_value = threshold_value(inputs)
+      if result >= threshold_value:
+        text = threshold.get('text')
+        style = threshold.get('style')
+        self.set_feedback(text)
+        self.set_style(style)
 
   def set_tooltip(self, tooltip: str):
     self.set_tooltip_text(tooltip)
@@ -48,3 +60,6 @@ class ResultRow(Adw.ActionRow):
   def on_row_clicked(self, row):
     if self.callback is not None:
       self.callback(row)
+
+  # def on_info_button(self, button):
+  #   self.info_dialog.present(self.get_root())

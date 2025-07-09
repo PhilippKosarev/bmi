@@ -8,6 +8,7 @@ class TimeRow():
     # Configuring row
     self.adjustment = Gtk.Adjustment(step_increment=1, page_increment=10)
     self.row = Adw.SpinRow.new(self.adjustment, 1, 0)
+    self.row.set_size_request(250, 60)
     self.row.set_subtitle(_('Years'))
     self.row.connect('output', self.on_value_changed)
     # Object vars

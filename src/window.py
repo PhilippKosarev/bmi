@@ -20,7 +20,7 @@
 
 # Imports
 from gi.repository import Gtk, Adw, Gio, Gdk
-import math
+import math, re
 
 # Internal imports
 ## Input rows
@@ -35,6 +35,32 @@ from .calculator import Calculator
 calc = Calculator()
 clipboard = Gdk.Display.get_default().get_clipboard()
 
+# Shorthand vars
+vertical = Gtk.Orientation.VERTICAL
+horizontal = Gtk.Orientation.HORIZONTAL
+px = Adw.LengthUnit.PX
+sp = Adw.LengthUnit.SP
+pt = Adw.LengthUnit.PT
+
+# Helper functions
+def eval_breakpoint(window, adw_breakpoint):
+  width = window.get_size(horizontal)
+  height = window.get_size(vertical)
+  condition = adw_breakpoint.get_condition().to_string()
+  condition = condition.replace('min-width:', 'width >')
+  condition = condition.replace('max-width:', 'width <')
+  condition = condition.replace('min-height:', 'height >')
+  condition = condition.replace('max-height:', 'height <')
+  conditions = condition.split('and')
+  for statement in conditions:
+    combined = re.search('([0-9]).*', statement).group().strip()
+    units = combined[-2] + combined[-1]
+    value = combined.removesuffix(units)
+    pixels = eval(f"Adw.LengthUnit.to_px({units}, {value})")
+    statement = statement.replace(combined, str(pixels))
+    if eval(statement) is False:
+      return False
+  return True
 
 def get_nth_child(parent, n):
   child = parent.get_first_child()
@@ -60,13 +86,12 @@ class BmiWindow(Adw.ApplicationWindow):
     # Important Widgets
     toast_overlay = Gtk.Template.Child()
     clamp = Gtk.Template.Child()
+    orientable_box = Gtk.Template.Child()
     ## Breakpoints
-    horizontal_breakpoint = Gtk.Template.Child()
-    vertical_breakpoint = Gtk.Template.Child()
-    ## Pages
-    first_page = Gtk.Template.Child()
-    second_page = Gtk.Template.Child()
-    third_page = Gtk.Template.Child()
+    simple_breakpoint = Gtk.Template.Child()
+    advanced_breakpoint = Gtk.Template.Child()
+    ## Clamps
+    advanced_inputs_clamp = Gtk.Template.Child()
     ## Groups
     basic_inputs_group = Gtk.Template.Child()
     advanced_inputs_group = Gtk.Template.Child()
@@ -180,43 +205,58 @@ class BmiWindow(Adw.ApplicationWindow):
       self.set_imperial(bool(self.settings["measurement-system"]))
 
       # Setting up adaptive ui
-      self.horizontal_breakpoint.connect('apply', self.horizontify_ui)
-      self.horizontal_breakpoint.connect('unapply', self.verticalize_ui)
-      self.vertical_breakpoint.connect('apply', self.verticalize_ui)
+      self.simple_breakpoint.connect('apply', self.on_simple_breakpoint_apply)
+      self.simple_breakpoint.connect('unapply', self.on_simple_breakpoint_unapply)
+      self.advanced_breakpoint.connect('apply', self.on_advanced_breakpoint_apply)
+      self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
 
-    def horizontify_ui(self, adw_breakpoint):
-      if len(get_groups(self.first_page)) != 3:
+    def on_simple_breakpoint_apply(self, adw_breakpoint = None):
+      if self.advanced_inputs_clamp.get_visible():
         return
-      self.first_page.remove(self.advanced_inputs_group)
-      self.second_page.add(self.advanced_inputs_group)
-      self.first_page.remove(self.results_group)
-      self.third_page.add(self.results_group)
-      self.clamp.set_maximum_size(1100)
-      self.second_page.set_visible(True)
-      self.third_page.set_visible(True)
+      self.horizontify_ui(True)
 
-    def verticalize_ui(self, adw_breakpoint):
-      if len(get_groups(self.first_page)) != 1:
+    def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
+      if self.advanced_inputs_clamp.get_visible():
         return
-      self.second_page.remove(self.advanced_inputs_group)
-      self.first_page.add(self.advanced_inputs_group)
-      self.third_page.remove(self.results_group)
-      self.first_page.add(self.results_group)
-      self.clamp.set_maximum_size(2147483647)
-      self.second_page.set_visible(False)
-      self.third_page.set_visible(False)
+      self.horizontify_ui(False)
+
+    def on_advanced_breakpoint_apply(self, adw_breakpoint = None):
+      self.horizontify_ui(True)
+
+    def on_advanced_breakpoint_unapply(self, adw_breakpoint = None):
+      self.horizontify_ui(False)
+
+    def horizontify_ui(self, true):
+      if true:
+        self.orientable_box.set_orientation(horizontal);
+        self.orientable_box.set_spacing(26);
+      else:
+        self.orientable_box.set_orientation(vertical);
+        self.orientable_box.set_spacing(16);
+
+    def update_breakpoints(self):
+      if eval_breakpoint(self, self.advanced_breakpoint):
+        self.on_advanced_breakpoint_apply()
+      else:
+        self.on_advanced_breakpoint_unapply()
+      if eval_breakpoint(self, self.simple_breakpoint):
+        self.on_simple_breakpoint_apply()
+      else:
+        self.on_simple_breakpoint_unapply()
+
 
     def set_advanced_mode(self, mode: bool):
       if mode:
-        self.advanced_inputs_group.set_visible(True)
+        self.advanced_inputs_clamp.set_visible(True)
         self.whtr_result_row.set_visible(True)
         self.whr_result_row.set_visible(True)
         self.bri_result_row.set_visible(True)
       else:
-        self.advanced_inputs_group.set_visible(False)
+        self.advanced_inputs_clamp.set_visible(False)
         self.whtr_result_row.set_visible(False)
         self.whr_result_row.set_visible(False)
         self.bri_result_row.set_visible(False)
+      self.update_breakpoints()
 
     def add_inputs_to_group(self, inputs, group):
       for item in inputs:
@@ -232,6 +272,7 @@ class BmiWindow(Adw.ApplicationWindow):
     def add_results_to_group(self, results, group):
       for item in results:
         row = item.get('widget')
+        row.set_callback(self.copy_result)
       return results
 
     def update_result(self, row):
@@ -249,19 +290,8 @@ class BmiWindow(Adw.ApplicationWindow):
         calc_func = item.get('calc_func')
         digits = item.get('digits')
         value = calc_func(inputs)
-        widget.set_result(value, digits)
-        widget.set_callback(self.copy_result)
-        # Setting feedback result
         thresholds = item.get('thresholds')
-        for threshold in thresholds:
-          threshold_value = threshold.get('value')
-          if callable(threshold_value):
-            threshold_value = threshold_value(inputs)
-          if value >= threshold_value:
-            text = threshold.get('text')
-            style = threshold.get('style')
-            widget.set_feedback(text)
-            widget.set_style(style)
+        widget.set_result(value, digits, inputs, thresholds)
 
     def copy_result(self, row):
       value = str(row.get_value())

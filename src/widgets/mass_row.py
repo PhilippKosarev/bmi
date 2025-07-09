@@ -12,6 +12,7 @@ class MassRow():
     # Configuring row
     self.adjustment = Gtk.Adjustment(step_increment=1, page_increment=10)
     self.row = Adw.SpinRow.new(self.adjustment, 1, 1)
+    self.row.set_size_request(250, 60)
     self.imperial = False
     self.value_range = {
       'lower': {'metric': 0, 'imperial': 0},
