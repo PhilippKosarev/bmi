@@ -200,7 +200,7 @@ msgstr ""
 msgid "Results"
 msgstr ""
 
-#: src/window.py:180 src/window.py:212 src/window.py:229
+#: src/window.py:180 src/window.py:212 src/window.py:229 src/window.blp:39
 msgid "Body Mass Index"
 msgstr ""
 

@@ -205,7 +205,7 @@ msgstr "Скопіювати ІМТ"
 msgid "Results"
 msgstr "Результати"
 
-#: src/window.py:180 src/window.py:212 src/window.py:229
+#: src/window.py:180 src/window.py:212 src/window.py:229 src/window.blp:39
 msgid "Body Mass Index"
 msgstr "Індекс Маси Тіла"
 
