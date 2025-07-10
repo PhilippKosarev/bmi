@@ -33,7 +33,7 @@
                     "type": "git",
                     "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler",
                     "tag": "v0.18.0",
-                    "commit": "98d29555858fdcac37336ba7365f30eb61aee11f230d",
+                    "commit": "07c9c9df9cd1b6b4454ecba21ee58211e9144a4b",
                     "x-checker-data": {
                         "type": "git",
                         "tag-pattern": "^v([\d.]+)$"
