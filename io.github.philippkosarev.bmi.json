@@ -23,6 +23,25 @@
     ],
     "modules" : [
         {
+            "name": "blueprint-compiler",
+            "buildsystem": "meson",
+            "cleanup": [
+                "*"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://gitlab.gnome.org/jwestman/blueprint-compiler",
+                    "tag": "v0.18.0",
+                    "commit": "98d29555858fdcac37336ba7365f30eb61aee11f230d",
+                    "x-checker-data": {
+                        "type": "git",
+                        "tag-pattern": "^v([\d.]+)$"
+                    }
+                }
+            ]
+        },
+        {
             "name" : "bmi",
             "builddir" : true,
             "buildsystem" : "meson",
