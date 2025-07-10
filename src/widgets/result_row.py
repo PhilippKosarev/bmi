@@ -22,6 +22,11 @@ class ResultRow(Adw.ActionRow):
     self.set_subtitle(subtitle)
 
   def set_result(self, result: str, digits: int, inputs: dict, thresholds: dict):
+    if type(result) is str:
+      self.label.set_label(result)
+      self.set_feedback('')
+      self.set_style(None)
+      return
     result = round(result, digits)
     self.label.set_label(str(result))
     # Setting feedback result
@@ -38,11 +43,13 @@ class ResultRow(Adw.ActionRow):
   def set_tooltip(self, tooltip: str):
     self.set_tooltip_text(tooltip)
 
-  def set_style(self, style: int):
+  def set_style(self, style):
     self.remove_css_class("light-blue")
     self.remove_css_class("success")
     self.remove_css_class("warning")
     self.remove_css_class("error")
+    if style is None:
+      return
     if style == 0:   self.add_css_class('light-blue')
     elif style == 1: self.add_css_class('success')
     elif style == 2: self.add_css_class('warning')
