@@ -57,7 +57,7 @@ def eval_breakpoint(window, adw_breakpoint):
     units = combined[-2] + combined[-1]
     value = combined.removesuffix(units)
     pixels = eval(f"Adw.LengthUnit.to_px({units}, {value})")
-    statement = statement.replace(combined, str(pixels))
+    statement = statement.replace(combined, str(math.ceil(pixels)))
     if eval(statement) is False:
       return False
   return True
@@ -211,12 +211,12 @@ class BmiWindow(Adw.ApplicationWindow):
       self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
 
     def on_simple_breakpoint_apply(self, adw_breakpoint = None):
-      if self.advanced_inputs_clamp.get_visible():
+      if self.settings['advanced-mode']:
         return
       self.horizontify_ui(True)
 
     def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
-      if self.advanced_inputs_clamp.get_visible():
+      if self.settings['advanced-mode']:
         return
       self.horizontify_ui(False)
 

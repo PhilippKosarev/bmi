@@ -10,7 +10,7 @@ class GenderRow():
     for item in [_("Average"), _("Female"), _("Male")]:
       self.string_list.append(item)
     self.row = Adw.ComboRow()
-    self.row.set_size_request(250, 60)
+    self.row.set_size_request(220, 60)
     self.row.set_model(self.string_list)
     self.set_title(_("Gender"))
     self.row.connect('notify::selected-item', self.on_row_activated)
