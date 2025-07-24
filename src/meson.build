@@ -46,6 +46,7 @@ bmi_sources = [
   'preferences/preferences.py',
   'preferences/preferences_switch.py',
   # Widgets
+  'widgets/spin_row.py',
   'widgets/distance_row.py',
   'widgets/mass_row.py',
   'widgets/time_row.py',

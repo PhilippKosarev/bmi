@@ -122,7 +122,7 @@ msgstr "Dimentica i valori di input dopo la chiusura"
 #: src/window.py:104 src/window.py:260 src/window.py:259 src/window.py:105
 #: src/window.py:369 src/window.blp:30 src/window.blp:42
 msgid "Inputs"
-msgstr ""Input"
+msgstr "Input"
 
 #. Height input
 #: src/window.py:108 src/window.py:228 src/window.py:227 src/window.py:110

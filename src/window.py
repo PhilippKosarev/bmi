@@ -75,10 +75,9 @@ def get_groups(page):
   groups = [group]
   while True:
     group = group.get_next_sibling()
-    if group is not None:
-      groups.append(group)
-    else:
+    if group is None:
       return groups
+    groups.append(group)
 
 
 @Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window.ui')
@@ -108,11 +107,7 @@ class BmiWindow(Adw.ApplicationWindow):
       super().__init__(**kwargs)
       # Settings
       self.settings = settings
-      window_size = self.settings['window-size']
-      self.set_default_size(window_size[0], window_size[1])
-      self.set_advanced_mode(self.settings['advanced-mode'])
-      # Connecting
-      self.connect("close-request", self.on_close_window)
+
       # Adding basic inputs
       basic_inputs = [
         # Height input
@@ -201,16 +196,22 @@ class BmiWindow(Adw.ApplicationWindow):
         }
       ]
       # Adding result rows to advanced results page
-      self.add_results_to_group(self.results, self.results_group)
+      for item in self.results:
+        row = item.get('widget')
+        row.set_callback(self.copy_result)
 
-      # Setting measurement system from settings
-      self.set_imperial(bool(self.settings["measurement-system"]))
-
-      # Setting up adaptive ui
+      # Connecting stuff
+      self.connect("close-request", self.on_close_window)
       self.simple_breakpoint.connect('apply', self.on_simple_breakpoint_apply)
       self.simple_breakpoint.connect('unapply', self.on_simple_breakpoint_unapply)
       self.advanced_breakpoint.connect('apply', self.on_advanced_breakpoint_apply)
       self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
+
+      # Setting properties from settings
+      window_size = self.settings['window-size']
+      self.set_default_size(window_size[0], window_size[1])
+      self.set_advanced_mode(self.settings['advanced-mode'])
+      self.set_imperial(bool(self.settings["measurement-system"]))
 
     def on_simple_breakpoint_apply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
@@ -257,18 +258,12 @@ class BmiWindow(Adw.ApplicationWindow):
       for item in inputs:
         row = item.get('widget')
         row.set_title(item.get('title'))
-        if ('min' in item) and ('max' in item):
+        if 'min' in item and 'max' in item:
           row.set_range(item.get('min'), item.get('max'))
         row.set_value(self.settings[item.get('key')])
         row.set_tooltip(item.get('tooltip'))
         row.set_group(group)
         row.set_callback(self.update_result)
-
-    def add_results_to_group(self, results, group):
-      for item in results:
-        row = item.get('widget')
-        row.set_callback(self.copy_result)
-      return results
 
     def update_result(self, row):
       # Getting inputs
@@ -291,7 +286,6 @@ class BmiWindow(Adw.ApplicationWindow):
     def copy_result(self, row):
       value = str(row.get_value())
       Gdk.Clipboard.set(clipboard, value);
-      print(f"Copied result '{value}'")
       self.show_toast(_("Result copied"))
 
     def show_toast(self, text):
@@ -302,19 +296,13 @@ class BmiWindow(Adw.ApplicationWindow):
     def set_imperial(self, imperial: bool):
       for item in self.inputs:
         widget = item.get('widget')
-        widget_name = widget.get_name()
-        if widget_name == 'DistanceRow' or widget_name == 'MassRow':
-          if imperial:
-            widget.set_imperial(True)
-          else:
-            widget.set_imperial(False)
+        if widget.get_name() in ('DistanceRow', 'MassRow'):
+          widget.set_imperial(imperial)
 
     # Action after closing the app window
     def on_close_window(self, widget, *args):
       # Setting gsettings values to adjustments to use them on next launch
-      window_width = self.get_size(Gtk.Orientation.HORIZONTAL)
-      window_height = self.get_size(Gtk.Orientation.VERTICAL)
-      self.settings['window-size'] = (window_width, window_height)
+      self.settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
       # Setting input values
       if self.settings["remember-inputs"]:
         for item in self.inputs:
