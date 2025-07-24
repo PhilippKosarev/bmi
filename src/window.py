@@ -23,24 +23,25 @@ from gi.repository import Gtk, Adw, Gio, Gdk
 import math, re
 
 # Internal imports
-## Input rows
 from .distance_row import DistanceRow
 from .mass_row import MassRow
 from .time_row import TimeRow
 from .gender_row import GenderRow
-## Result row
 from .result_row import ResultRow
-## Other
 from .calculator import Calculator
 calc = Calculator()
+
 clipboard = Gdk.Display.get_default().get_clipboard()
 
 # Shorthand vars
 vertical = Gtk.Orientation.VERTICAL
 horizontal = Gtk.Orientation.HORIZONTAL
-px = Adw.LengthUnit.PX
-sp = Adw.LengthUnit.SP
-pt = Adw.LengthUnit.PT
+adw_lenght_units = {
+  'px': Adw.LengthUnit.PX,
+  'sp': Adw.LengthUnit.SP,
+  'pt': Adw.LengthUnit.PT,
+}
+
 
 # Helper functions
 def eval_breakpoint(window, adw_breakpoint):
@@ -51,13 +52,14 @@ def eval_breakpoint(window, adw_breakpoint):
   condition = condition.replace('max-width:', 'width <')
   condition = condition.replace('min-height:', 'height >')
   condition = condition.replace('max-height:', 'height <')
-  conditions = condition.split('and')
-  for statement in conditions:
+  condition = condition.split('and')
+  for statement in condition:
     combined = re.search('([0-9]).*', statement).group().strip()
-    units = combined[-2] + combined[-1]
-    value = combined.removesuffix(units)
-    pixels = eval(f"Adw.LengthUnit.to_px({units}, {value})")
-    statement = statement.replace(combined, str(math.ceil(pixels)))
+    units = combined[-2] + combined[-1] # Last 2 chars (i.e. px, sp or pt)
+    value = float(combined.removesuffix(units))
+    units = adw_lenght_units.get(units)
+    pixels = math.ceil( Adw.LengthUnit.to_px(units, value) )
+    statement = statement.replace(combined, str(pixels))
     if eval(statement) is False:
       return False
   return True
@@ -213,25 +215,24 @@ class BmiWindow(Adw.ApplicationWindow):
     def on_simple_breakpoint_apply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
         return
-      self.horizontify_ui(True)
+      self.set_ui_orientation(horizontal)
 
     def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
         return
-      self.horizontify_ui(False)
+      self.set_ui_orientation(vertical)
 
     def on_advanced_breakpoint_apply(self, adw_breakpoint = None):
-      self.horizontify_ui(True)
+      self.set_ui_orientation(horizontal)
 
     def on_advanced_breakpoint_unapply(self, adw_breakpoint = None):
-      self.horizontify_ui(False)
+      self.set_ui_orientation(vertical)
 
-    def horizontify_ui(self, true):
-      if true:
-        self.orientable_box.set_orientation(horizontal);
+    def set_ui_orientation(self, orientation: horizontal or vertical):
+      self.orientable_box.set_orientation(orientation)
+      if orientation is horizontal:
         self.orientable_box.set_spacing(24);
       else:
-        self.orientable_box.set_orientation(vertical);
         self.orientable_box.set_spacing(16);
 
     def update_breakpoints(self):
@@ -246,16 +247,10 @@ class BmiWindow(Adw.ApplicationWindow):
 
 
     def set_advanced_mode(self, mode: bool):
-      if mode:
-        self.advanced_inputs_clamp.set_visible(True)
-        self.whtr_result_row.set_visible(True)
-        self.whr_result_row.set_visible(True)
-        self.bri_result_row.set_visible(True)
-      else:
-        self.advanced_inputs_clamp.set_visible(False)
-        self.whtr_result_row.set_visible(False)
-        self.whr_result_row.set_visible(False)
-        self.bri_result_row.set_visible(False)
+      self.advanced_inputs_clamp.set_visible(mode)
+      self.whtr_result_row.set_visible(mode)
+      self.whr_result_row.set_visible(mode)
+      self.bri_result_row.set_visible(mode)
       self.update_breakpoints()
 
     def add_inputs_to_group(self, inputs, group):
