@@ -7,7 +7,7 @@ template $BmiWindow: Adw.ApplicationWindow {
   height-request: 240;
   // Breakpoints
   Adw.Breakpoint simple_breakpoint {
-    condition ("min-width: 550sp and max-height: 350sp")
+    condition ("min-width: 580sp and max-height: 350sp")
   }
   Adw.Breakpoint advanced_breakpoint {
     condition ("min-width: 840sp and max-height: 730sp")
@@ -28,6 +28,7 @@ template $BmiWindow: Adw.ApplicationWindow {
     // Content
     content: Adw.ToastOverlay toast_overlay {
       ScrolledWindow {
+        hscrollbar-policy: never;
         Adw.Clamp clamp {
           maximum-size: 1100;
           Box orientable_box {
