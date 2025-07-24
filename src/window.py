@@ -42,7 +42,6 @@ adw_lenght_units = {
   'pt': Adw.LengthUnit.PT,
 }
 
-
 # Helper functions
 def eval_breakpoint(window, adw_breakpoint):
   width = window.get_size(horizontal)
@@ -79,6 +78,15 @@ def get_groups(page):
       return groups
     groups.append(group)
 
+def get_metric_row_value(row):
+  row_name = row.get_name()
+  if row_name == 'DistanceRow':
+    value = row.get_centimetres()
+  elif row_name == 'MassRow':
+    value = row.get_kilograms()
+  else:
+    value = row.get_value()
+  return value
 
 @Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window.ui')
 class BmiWindow(Adw.ApplicationWindow):
@@ -88,15 +96,16 @@ class BmiWindow(Adw.ApplicationWindow):
     toast_overlay = Gtk.Template.Child()
     clamp = Gtk.Template.Child()
     orientable_box = Gtk.Template.Child()
-    ## Breakpoints
     simple_breakpoint = Gtk.Template.Child()
     advanced_breakpoint = Gtk.Template.Child()
-    ## Clamps
     advanced_inputs_clamp = Gtk.Template.Child()
-    ## Groups
-    basic_inputs_group = Gtk.Template.Child()
-    advanced_inputs_group = Gtk.Template.Child()
-    results_group = Gtk.Template.Child()
+    ## Input rows
+    height_input_row = Gtk.Template.Child()
+    weight_input_row = Gtk.Template.Child()
+    gender_input_row = Gtk.Template.Child()
+    age_input_row = Gtk.Template.Child()
+    waist_input_row = Gtk.Template.Child()
+    hip_input_row = Gtk.Template.Child()
     ## Result rows
     bmi_result_row = Gtk.Template.Child()
     whtr_result_row = Gtk.Template.Child()
@@ -105,48 +114,24 @@ class BmiWindow(Adw.ApplicationWindow):
 
     def __init__(self, settings, **kwargs):
       super().__init__(**kwargs)
-      # Settings
       self.settings = settings
+      # Configuring inputs
+      self.input_rows = {
+        'height': self.height_input_row,
+        'mass':   self.weight_input_row,
+        'gender': self.gender_input_row,
+        'age':    self.age_input_row,
+        'waist':  self.waist_input_row,
+        'hip':    self.hip_input_row,
+      }
+      self.set_imperial(bool(self.settings['measurement-system']))
+      for key in self.input_rows:
+        row = self.input_rows.get(key)
+        value = self.settings[key]
+        row.set_value(value)
+        row.set_callback(self.update_inputs)
 
-      # Adding basic inputs
-      basic_inputs = [
-        # Height input
-        {'title': _('Height'), 'widget': DistanceRow(),
-        'key': 'height', 'min': 50, 'max': 270,
-        'tooltip': _('Affects BMI and BRI')},
-        # Weight input
-        {'title': _('Weight'), 'widget': MassRow(),
-        'key': 'mass', 'min': 15, 'max': 650,
-        'tooltip': _('Affects BMI')},
-      ]
-      self.add_inputs_to_group(basic_inputs, self.basic_inputs_group)
-
-      # Adding advanced inputs
-      advanced_inputs = [
-        # Gender input
-        {'title': _('Gender'), 'widget': GenderRow(),
-       'key': 'gender',
-       'tooltip': _('Affects healthy/unhealthy thresholds for Waist to Hip ratio')},
-        # Age input
-        {'title': _('Age'), 'widget': TimeRow(),
-       'key': 'age', 'min': 18, 'max': 130,
-       'tooltip': _('Affects healthy/unhealthy thresholds for Waist to Height ratio')},
-        # Waist circumference
-        {'title': _('Waist'), 'widget': DistanceRow(),
-       'key': 'waist', 'min': 25, 'max': 800,
-       'tooltip': _('Affects Waist to Height ratio, Waist to Hip ratio and BRI')},
-        # Hip circumference
-        {'title': _('Hip'), 'widget': DistanceRow(),
-        'key': 'hip', 'min': 25, 'max': 800,
-        'tooltip': _('Affects Waist to Hip ratio')},
-      ]
-      self.add_inputs_to_group(
-        advanced_inputs, self.advanced_inputs_group
-      )
-      # All inputs
-      self.inputs = basic_inputs + advanced_inputs
-
-      # Advanced results
+      # Configuring results
       self.results = [
         {
           'widget': self.bmi_result_row,
@@ -195,7 +180,7 @@ class BmiWindow(Adw.ApplicationWindow):
           ]
         }
       ]
-      # Adding result rows to advanced results page
+      # Connecting result rows
       for item in self.results:
         row = item.get('widget')
         row.set_callback(self.copy_result)
@@ -208,16 +193,17 @@ class BmiWindow(Adw.ApplicationWindow):
       self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
 
       # Setting properties from settings
-      window_size = self.settings['window-size']
-      self.set_default_size(window_size[0], window_size[1])
+      window_width, window_height = self.settings['window-size']
+      self.set_default_size(window_width, window_height)
       self.set_advanced_mode(self.settings['advanced-mode'])
-      self.set_imperial(bool(self.settings["measurement-system"]))
+
+      # Updating inputs, calculating results and setting results
+      self.update_inputs()
 
     def on_simple_breakpoint_apply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
         return
       self.set_ui_orientation(horizontal)
-
     def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
         return
@@ -225,7 +211,6 @@ class BmiWindow(Adw.ApplicationWindow):
 
     def on_advanced_breakpoint_apply(self, adw_breakpoint = None):
       self.set_ui_orientation(horizontal)
-
     def on_advanced_breakpoint_unapply(self, adw_breakpoint = None):
       self.set_ui_orientation(vertical)
 
@@ -246,7 +231,6 @@ class BmiWindow(Adw.ApplicationWindow):
       else:
         self.on_simple_breakpoint_unapply()
 
-
     def set_advanced_mode(self, mode: bool):
       self.advanced_inputs_clamp.set_visible(mode)
       self.whtr_result_row.set_visible(mode)
@@ -254,26 +238,15 @@ class BmiWindow(Adw.ApplicationWindow):
       self.bri_result_row.set_visible(mode)
       self.update_breakpoints()
 
-    def add_inputs_to_group(self, inputs, group):
-      for item in inputs:
-        row = item.get('widget')
-        row.set_title(item.get('title'))
-        if 'min' in item and 'max' in item:
-          row.set_range(item.get('min'), item.get('max'))
-        row.set_value(self.settings[item.get('key')])
-        row.set_tooltip(item.get('tooltip'))
-        row.set_group(group)
-        row.set_callback(self.update_result)
-
-    def update_result(self, row):
-      # Getting inputs
+    def update_inputs(self, row = None):
       inputs = {}
-      for item in self.inputs:
-        key = item.get('key')
-        widget = item.get('widget')
-        value = widget.get_value()
+      for key in self.input_rows:
+        row = self.input_rows.get(key)
+        value = get_metric_row_value(row)
         inputs[key] = value
-      # Updating results
+      self.update_results(inputs)
+
+    def update_results(self, inputs: dict):
       for item in self.results:
         # Setting result
         widget = item.get('widget')
@@ -294,10 +267,10 @@ class BmiWindow(Adw.ApplicationWindow):
       self.toast_overlay.add_toast(toast)
 
     def set_imperial(self, imperial: bool):
-      for item in self.inputs:
-        widget = item.get('widget')
-        if widget.get_name() in ('DistanceRow', 'MassRow'):
-          widget.set_imperial(imperial)
+      for key in self.input_rows:
+        row = self.input_rows.get(key)
+        if row.get_name() in ('DistanceRow', 'MassRow'):
+          row.set_imperial(imperial)
 
     # Action after closing the app window
     def on_close_window(self, widget, *args):
@@ -305,11 +278,10 @@ class BmiWindow(Adw.ApplicationWindow):
       self.settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
       # Setting input values
       if self.settings["remember-inputs"]:
-        for item in self.inputs:
-          key = item.get('key')
-          value = item.get('widget').get_value()
+        for key in self.input_rows:
+          row = self.input_rows.get(key)
+          value = row.get_value()
           self.settings[key] = value
       else:
-        for item in self.inputs:
-          key = item.get('key')
+        for key in self.input_rows:
           self.settings.reset(key)

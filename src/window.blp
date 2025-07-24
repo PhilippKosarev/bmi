@@ -3,15 +3,14 @@ using Adw 1;
 
 template $BmiWindow: Adw.ApplicationWindow {
   // Basic window properties
-  title: _("BMI");
-  width-request: 310;
+  title: "BMI";
   height-request: 240;
   // Breakpoints
   Adw.Breakpoint simple_breakpoint {
     condition ("min-width: 550sp and max-height: 350sp")
   }
   Adw.Breakpoint advanced_breakpoint {
-    condition ("min-width: 820sp and max-height: 730sp")
+    condition ("min-width: 840sp and max-height: 730sp")
   }
   // Content
   [content]
@@ -36,21 +35,62 @@ template $BmiWindow: Adw.ApplicationWindow {
             margin-start: 20;
             margin-end: 20;
             margin-bottom: 20;
+
+            // Basic inputs
             Adw.Clamp basic_inputs_clamp {
               maximum-size: 400;
-              Adw.PreferencesGroup basic_inputs_group {
+              Adw.PreferencesGroup {
                 title: _("Inputs");
+                $DistanceRow height_input_row {
+                  title: _("Height");
+                  lower: 10;
+                  upper: 999;
+                  tooltip-text: _("Affects BMI and BRI");
+                }
+                $MassRow weight_input_row {
+                  title: _("Weight");
+                  lower: 10;
+                  upper: 999;
+                  tooltip-text: _("Affects BMI");
+                }
               }
             }
+
+            // Advanced inputs
             Adw.Clamp advanced_inputs_clamp {
               maximum-size: 400;
-              Adw.PreferencesGroup advanced_inputs_group {
+              Adw.PreferencesGroup {
                 title: _("Advanced inputs");
+                $GenderRow gender_input_row {
+                  tooltip-text: _("Affects healthy/unhealthy thresholds for Waist to Hip ratio");
+                }
+                $SpinRow age_input_row {
+                  title: _("Age");
+                  subtitle: _("Years");
+                  digits: 0;
+                  lower: 18;
+                  upper: 150;
+                  tooltip-text: _("Affects healthy/unhealthy thresholds for Waist to Height ratio");
+                }
+                $DistanceRow waist_input_row {
+                  title: _("Waist");
+                  lower: 10;
+                  upper: 999;
+                  tooltip-text: _("Affects Waist to Height ratio, Waist to Hip ratio and BRI");
+                }
+                $DistanceRow hip_input_row {
+                  title: _("Hip");
+                  lower: 10;
+                  upper: 999;
+                  tooltip-text: _("Affects Waist to Hip ratio");
+                }
               }
             }
+
+            // Results
             Adw.Clamp results_clamp {
               maximum-size: 400;
-              Adw.PreferencesGroup results_group {
+              Adw.PreferencesGroup {
                 title: _("Results");
                 $ResultRow bmi_result_row {
                   title: _("BMI");
@@ -70,6 +110,7 @@ template $BmiWindow: Adw.ApplicationWindow {
                 }
               }
             }
+
           }
         }
       }

@@ -52,7 +52,7 @@ class ResultRow(Adw.ActionRow):
     if type(result) is str:
       self.label.set_label(result)
       self.set_feedback('')
-      self.set_style(None)
+      set_style(self, None)
       self.info_button.set_visible(False)
       return
     self.info_button.set_visible(True)
@@ -94,7 +94,11 @@ class ResultRow(Adw.ActionRow):
     self.set_tooltip_text(tooltip)
 
   def get_value(self):
-    return float(self.label.get_label())
+    try:
+      return float(self.label.get_label())
+    # In case label is not a number
+    except ValueError:
+      return self.label.get_label()
 
   def set_callback(self, callback):
     self.callback = callback

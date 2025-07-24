@@ -11,7 +11,9 @@ class Calculator:
 
   # Returns Waist To Height Ratio
   def whtr(self, inputs: dict):
-    return inputs.get('waist') / inputs.get('height')
+    waist = inputs.get('waist')
+    height = inputs.get('height')
+    return waist / height
   # Returns health thresholds for WHTR
   def whtr_unhealthy(self, inputs: dict):
     age = inputs.get('age')
@@ -26,16 +28,21 @@ class Calculator:
   # Returns overweight threshold for WHR
   def whr_overweight(self, inputs: dict):
     gender = inputs.get('gender')
-    if   gender == 0: return 0.85 # Average
-    if   gender == 1: return 0.8 # Female
-    elif gender == 2: return 0.9 # Male
+    thresholds_by_gender = {
+      'average': 0.85,
+      'female': 0.8,
+      'male': 0.9,
+    }
+    return thresholds_by_gender.get(gender)
   # Returns obese thresholds for WHR
   def whr_obese(self, inputs: dict):
     gender = inputs.get('gender')
-    if   gender == 0: return 0.925 # Average
-    if   gender == 1: return 0.85 # Female
-    elif gender == 2: return 1 # Male
-
+    thresholds_by_gender = {
+      'average': 0.925,
+      'female': 0.85,
+      'male': 1,
+    }
+    return thresholds_by_gender.get(gender)
 
   # Returns Body Roundness Index
   def bri(self, inputs: dict):
