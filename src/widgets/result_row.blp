@@ -11,23 +11,26 @@ template $ResultRow: Adw.ActionRow {
     styles ["title-3"]
     label: "0.0";
   }
-  // [suffix]
-  // Button info_button {
-  //   styles ["circular", "flat"]
-  //   valign: center;
-  //   icon-name: "help-about-symbolic";
-  // }
+  [suffix]
+  Button info_button {
+    styles ["circular", "flat"]
+    valign: center;
+    icon-name: "help-about-symbolic";
+  }
 }
 
-// Adw.Dialog info_dialog {
-//   title: "Info";
-//   content-width: 300;
-//   content-height: 400;
-//   Adw.ToolbarView {
-//     [top]
-//     Adw.HeaderBar {}
-//     content: Box {
-//       Adw.PreferencesPage info_page {}
-//     };
-//   }
-// }
+Adw.Dialog info_dialog {
+  content-width: 400;
+  vexpand: true;
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+    content: Box {
+      Adw.PreferencesPage info_page {
+        Adw.PreferencesGroup thresholds_group {
+          title: _("Thresholds");
+        }
+      }
+    };
+  }
+}

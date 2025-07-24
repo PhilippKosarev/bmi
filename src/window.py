@@ -229,7 +229,7 @@ class BmiWindow(Adw.ApplicationWindow):
     def horizontify_ui(self, true):
       if true:
         self.orientable_box.set_orientation(horizontal);
-        self.orientable_box.set_spacing(26);
+        self.orientable_box.set_spacing(24);
       else:
         self.orientable_box.set_orientation(vertical);
         self.orientable_box.set_spacing(16);
