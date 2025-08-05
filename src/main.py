@@ -48,7 +48,7 @@ class BmiApplication(Adw.Application):
   # Shows the about dialog
   def show_about(self, action, param):
     # Creating about dialog
-    about = Adw.AboutWindow(
+    about = Adw.AboutDialog(
       application_name   = 'BMI',
       application_icon   = 'io.github.philippkosarev.bmi',
       version            = 'v4.0',
@@ -70,8 +70,7 @@ class BmiApplication(Adw.Application):
         'Maksym Dilanian https://github.com/maksym-dilanian',
       ]
     )
-    about.set_transient_for(self.props.active_window)
-    about.present()
+    about.present(self.props.active_window)
 
   def on_quit(self, action, param):
     self.win.on_close_window(widget="")
