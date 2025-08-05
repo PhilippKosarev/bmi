@@ -33,25 +33,27 @@ from .preferences import BmiPreferences
 # The main application singleton class
 class BmiApplication(Adw.Application):
 
-  def __init__(self):
+  def __init__(self, version: str):
+    self.version = version
     super().__init__(application_id='io.github.philippkosarev.bmi',
                      flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
     self.create_action('preferences', self.show_preferences, ['<primary>comma'])
     self.create_action('about', self.show_about, ['F1'])
     self.create_action('quit', self.on_quit, ['<primary>q', '<primary>w'])
 
+  # Shows the preferences dialog.
   def show_preferences(self, action, param):
     preferences = BmiPreferences(self.props.active_window, settings)
     preferences.set_transient_for(self.props.active_window)
     preferences.present()
 
-  # Shows the about dialog
+  # Shows the about dialog.
   def show_about(self, action, param):
     # Creating about dialog
     about = Adw.AboutDialog(
       application_name   = 'BMI',
       application_icon   = 'io.github.philippkosarev.bmi',
-      version            = 'v4.0',
+      version            = self.version,
       developer_name     = 'Philipp Kosarev',
       developers         = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
@@ -92,7 +94,7 @@ class BmiApplication(Adw.Application):
     if shortcuts:
         self.set_accels_for_action(f"app.{name}", shortcuts)
 
+# The application's entry point.
 def main(version):
-  # The application's entry point
-  app = BmiApplication()
+  app = BmiApplication(version)
   return app.run(sys.argv)
