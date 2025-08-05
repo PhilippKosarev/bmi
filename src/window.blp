@@ -96,18 +96,22 @@ template $BmiWindow: Adw.ApplicationWindow {
                 $ResultRow bmi_result_row {
                   title: _("BMI");
                   tooltip-text: _("Body Mass Index");
+                  digits: 1;
                 }
                 $ResultRow whtr_result_row {
                   title: _("Waist / Height");
                   tooltip-text: _("Waist to height ratio");
+                  digits: 2;
                 }
                 $ResultRow whr_result_row {
                   title: _("Waist / Hip");
                   tooltip-text: _("Waist to hip ratio");
+                  digits: 2;
                 }
                 $ResultRow bri_result_row {
                   title: _("BRI");
                   tooltip-text: _("Body Roundness Index");
+                  digits: 2;
                 }
               }
             }

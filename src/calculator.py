@@ -10,7 +10,7 @@ class Calculator:
 
 
   # Returns Waist To Height Ratio
-  def whtr(self, inputs: dict):
+  def whtr(self, inputs: dict) -> float:
     waist = inputs.get('waist')
     height = inputs.get('height')
     return waist / height
@@ -23,10 +23,10 @@ class Calculator:
 
 
   # Returns Waist to Hip Ratio
-  def whr(self, inputs: dict):
+  def whr(self, inputs: dict) -> float:
     return inputs.get('waist') / inputs.get('hip')
   # Returns overweight threshold for WHR
-  def whr_overweight(self, inputs: dict):
+  def whr_overweight(self, inputs: dict) -> float:
     gender = inputs.get('gender')
     thresholds_by_gender = {
       'average': 0.85,
@@ -34,8 +34,8 @@ class Calculator:
       'male': 0.9,
     }
     return thresholds_by_gender.get(gender)
-  # Returns obese thresholds for WHR
-  def whr_obese(self, inputs: dict):
+  # Returns obese threshold for WHR
+  def whr_obese(self, inputs: dict) -> float:
     gender = inputs.get('gender')
     thresholds_by_gender = {
       'average': 0.925,
@@ -45,7 +45,7 @@ class Calculator:
     return thresholds_by_gender.get(gender)
 
   # Returns Body Roundness Index
-  def bri(self, inputs: dict):
+  def bri(self, inputs: dict) -> float:
     waist = inputs.get('waist')
     height = inputs.get('height')
     try:

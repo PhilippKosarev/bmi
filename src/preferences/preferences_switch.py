@@ -27,8 +27,8 @@ class PreferencesSwitch(Adw.ActionRow):
     def on_switch_toggled(self, switch, param):
       active = self.get_active()
       if (self.settings is not None) and (self.key is not None):
-        success = self.settings.set_boolean(self.key, active)
-        if success is False:
+        succeded = self.settings.set_boolean(self.key, active)
+        if not succeded:
           value = self.settings.get_boolean(self.key)
           self.set_active(value)
           return

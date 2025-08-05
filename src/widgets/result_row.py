@@ -1,5 +1,5 @@
 # Imports
-from gi.repository import Gtk, Adw
+from gi.repository import GObject, Gtk, Adw
 
 # Helper functions
 def clear_styles(widget):
@@ -36,19 +36,33 @@ class ResultRow(Adw.ActionRow):
   info_dialog = Gtk.Template.Child()
   info_page = Gtk.Template.Child()
   thresholds_group = Gtk.Template.Child()
+  # Properties
+  digits = GObject.Property(type=int, default=0)
   rows = []
+  thresholds = []
+  calc_func = None
 
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.connect("activated", self.on_row_clicked)
+    self.connect('activated', self.on_row_clicked)
     self.info_button.connect('clicked', self.on_info_button)
     self.callback = None
 
   def set_feedback(self, subtitle: str):
     self.set_subtitle(subtitle)
 
-  def set_result(self, result: str, digits: int, inputs: dict, thresholds: dict):
-    # Setting result
+  def set_thresholds(self, thresholds: list):
+    self.thresholds = thresholds
+
+  def set_calc_func(self, calc_func: callable):
+    self.calc_func = calc_func
+
+  def update(self, inputs: dict):
+    # print(self.calc_func)
+    if self.calc_func is not None:
+      result = self.calc_func(inputs)
+    else:
+      result = 'N/A'
     if type(result) is str:
       self.label.set_label(result)
       self.set_feedback('')
@@ -56,29 +70,33 @@ class ResultRow(Adw.ActionRow):
       self.info_button.set_visible(False)
       return
     self.info_button.set_visible(True)
-    result = round(result, digits)
-    self.label.set_label(str(result))
-    # Setting feedback result
-    for threshold in thresholds:
+    result_text = str(round(result, self.digits))
+    self.label.set_label(result_text)
+    self.update_feedback(inputs, result)
+
+  def update_feedback(self, inputs: dict, result: float):
+    for threshold in self.thresholds:
       threshold_value = threshold.get('value')
       if callable(threshold_value):
         threshold_value = threshold_value(inputs)
       if result >= threshold_value:
         self.set_feedback(threshold.get('text'))
         set_style(self, threshold.get('style'))
-    # Setting info dialogue stuff
-    ## Clearing old rows
+    self.update_info_dialog(inputs)
+
+  def update_info_dialog(self, inputs: dict):
+    # Clearing old rows
     for row in self.rows:
       self.thresholds_group.remove(row)
       del row
     self.rows = []
-    ## Creating new rows
-    for threshold in thresholds:
+    # Creating new rows
+    for threshold in self.thresholds:
       row = Adw.ActionRow()
       feedback = threshold.get('text')
       set_style(row, threshold.get('style'))
-      if threshold == thresholds[0]:
-        threshold_value = thresholds[1].get('value')
+      if threshold == self.thresholds[0]:
+        threshold_value = self.thresholds[1].get('value')
         text = f"Under threshold_value is {feedback}"
       else:
         threshold_value = threshold.get('value')

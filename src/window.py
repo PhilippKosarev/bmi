@@ -59,7 +59,7 @@ def eval_breakpoint(window, adw_breakpoint):
     units = adw_lenght_units.get(units)
     pixels = math.ceil( Adw.LengthUnit.to_px(units, value) )
     statement = statement.replace(combined, str(pixels))
-    if eval(statement) is False:
+    if not eval(statement):
       return False
   return True
 
@@ -130,60 +130,46 @@ class BmiWindow(Adw.ApplicationWindow):
         value = self.settings[key]
         row.set_value(value)
         row.set_callback(self.update_inputs)
-
       # Configuring results
-      self.results = [
-        {
-          'widget': self.bmi_result_row,
-          'digits': 1,
-          'calc_func':  calc.bmi,
-          'thresholds': [
-            {'text': _('Underweight [Severe]'),   'value': 0,    'style': 0},
-            {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 0},
-            {'text': _('Underweight [Mild]'),     'value': 17,   'style': 0},
-            {'text': _('Healthy'),                'value': 18.5, 'style': 1},
-            {'text': _('Overweight'),             'value': 25,   'style': 2},
-            {'text': _('Obese [Class 1]'),        'value': 30,   'style': 3},
-            {'text': _('Obese [Class 2]'),        'value': 35,   'style': 3},
-            {'text': _('Obese [Class 3]'),        'value': 40,   'style': 3},
-          ]
-        },
-        {
-          'widget': self.whtr_result_row,
-          'calc_func':  calc.whtr,
-          'digits': 2,
-          'thresholds': [
-            {'text': _('Healthy'),   'value': 0,                        'style': 1},
-            {'text': _('Unhealthy'), 'value': calc.whtr_unhealthy, 'style': 2},
-          ]
-        },
-        {
-          'widget': self.whr_result_row,
-          'calc_func':  calc.whr,
-          'digits': 2,
-          'thresholds': [
-            {'text': _('Healthy'),    'value': 0,                   'style': 1},
-            {'text': _('Overweight'), 'value': calc.whr_overweight, 'style': 2},
-            {'text': _('Obese'),      'value': calc.whr_obese,      'style': 3},
-          ]
-        },
-        {
-          'widget': self.bri_result_row,
-          'digits': 2,
-          'calc_func':  calc.bri,
-          'thresholds': [
-            {'text': _('Very lean'),     'value': 0,    'style': 0},
-            {'text': _('Lean'),          'value': 3.41, 'style': 1},
-            {'text': _('Average'),       'value': 4.45, 'style': 1},
-            {'text': _('Above average'), 'value': 5.46, 'style': 2},
-            {'text': _('High'),          'value': 6.91, 'style': 3},
-          ]
-        }
+      self.result_rows = [
+        self.bmi_result_row,
+        self.whtr_result_row,
+        self.whr_result_row,
+        self.bri_result_row,
       ]
-      # Connecting result rows
-      for item in self.results:
-        row = item.get('widget')
+      for row in self.result_rows:
         row.set_callback(self.copy_result)
+      # Setting result thresholds and calc functions
+      self.bmi_result_row.set_calc_func(calc.bmi)
+      self.bmi_result_row.set_thresholds([
+        {'text': _('Underweight [Severe]'),   'value': 0,    'style': 0},
+        {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 0},
+        {'text': _('Underweight [Mild]'),     'value': 17,   'style': 0},
+        {'text': _('Healthy'),                'value': 18.5, 'style': 1},
+        {'text': _('Overweight'),             'value': 25,   'style': 2},
+        {'text': _('Obese [Class 1]'),        'value': 30,   'style': 3},
+        {'text': _('Obese [Class 2]'),        'value': 35,   'style': 3},
+        {'text': _('Obese [Class 3]'),        'value': 40,   'style': 3},
+      ])
+      self.whtr_result_row.set_calc_func(calc.whtr)
+      self.whtr_result_row.set_thresholds([
+        {'text': _('Healthy'),   'value': 0,                   'style': 1},
+        {'text': _('Unhealthy'), 'value': calc.whtr_unhealthy, 'style': 2},
+      ])
+      self.whr_result_row.set_calc_func(calc.whr)
+      self.whr_result_row.set_thresholds([
+        {'text': _('Healthy'),    'value': 0,                   'style': 1},
+        {'text': _('Overweight'), 'value': calc.whr_overweight, 'style': 2},
+        {'text': _('Obese'),      'value': calc.whr_obese,      'style': 3},
+      ])
+      self.bri_result_row.set_calc_func(calc.bri)
+      self.bri_result_row.set_thresholds([
+        {'text': _('Very lean'),     'value': 0,    'style': 0},
+        {'text': _('Lean'),          'value': 3.41, 'style': 1},
+        {'text': _('Average'),       'value': 4.45, 'style': 1},
+        {'text': _('Above average'), 'value': 5.46, 'style': 2},
+        {'text': _('High'),          'value': 6.91, 'style': 3},
+      ])
 
       # Connecting stuff
       self.connect("close-request", self.on_close_window)
@@ -204,6 +190,7 @@ class BmiWindow(Adw.ApplicationWindow):
       if self.settings['advanced-mode']:
         return
       self.set_ui_orientation(horizontal)
+
     def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
       if self.settings['advanced-mode']:
         return
@@ -211,6 +198,7 @@ class BmiWindow(Adw.ApplicationWindow):
 
     def on_advanced_breakpoint_apply(self, adw_breakpoint = None):
       self.set_ui_orientation(horizontal)
+
     def on_advanced_breakpoint_unapply(self, adw_breakpoint = None):
       self.set_ui_orientation(vertical)
 
@@ -247,14 +235,8 @@ class BmiWindow(Adw.ApplicationWindow):
       self.update_results(inputs)
 
     def update_results(self, inputs: dict):
-      for item in self.results:
-        # Setting result
-        widget = item.get('widget')
-        calc_func = item.get('calc_func')
-        digits = item.get('digits')
-        value = calc_func(inputs)
-        thresholds = item.get('thresholds')
-        widget.set_result(value, digits, inputs, thresholds)
+      for row in self.result_rows:
+        row.update(inputs)
 
     def copy_result(self, row):
       value = str(row.get_value())
@@ -272,7 +254,7 @@ class BmiWindow(Adw.ApplicationWindow):
         if row.get_name() in ('DistanceRow', 'MassRow'):
           row.set_imperial(imperial)
 
-    # Action after closing the app window
+    # Action after closing the app window.
     def on_close_window(self, widget, *args):
       # Setting gsettings values to adjustments to use them on next launch
       self.settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
