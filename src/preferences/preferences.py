@@ -5,7 +5,7 @@ from gi.repository import Gtk, Adw, Gio
 from .preferences_switch import PreferencesSwitch
 
 @Gtk.Template(resource_path='/io/github/philippkosarev/bmi/preferences/preferences.ui')
-class BmiPreferences(Adw.PreferencesWindow):
+class BmiPreferences(Adw.PreferencesDialog):
     __gtype_name__ = 'BmiPreferences'
 
     # Important Widgets
@@ -13,10 +13,9 @@ class BmiPreferences(Adw.PreferencesWindow):
     measurement_system_row = Gtk.Template.Child()
     remember_inputs_row = Gtk.Template.Child()
 
-    def __init__(self, window, settings, **kwargs):
+    def __init__(self, settings, **kwargs):
       super().__init__(**kwargs)
       # Object vars
-      self.window = window
       self.settings = settings
       # Setting up setting rows
       ## Advanced Mode
@@ -29,7 +28,7 @@ class BmiPreferences(Adw.PreferencesWindow):
       self.remember_inputs_row.set_setting(self.settings, 'remember-inputs')
 
     def on_mode_changed(self, row, active):
-      self.window.set_advanced_mode(active)
+      self.get_root().set_advanced_mode(active)
 
     def on_measurements_changed(self, row, param):
       selected = self.measurement_system_row.get_selected()
@@ -38,4 +37,4 @@ class BmiPreferences(Adw.PreferencesWindow):
         value = self.settings['measurement-system']
         self.measurement_system_row.set_selected(value)
         return
-      self.window.set_imperial(bool(selected))
+      self.get_root().set_imperial(bool(selected))

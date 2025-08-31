@@ -24,8 +24,6 @@ gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 from gi.repository import Gtk, Adw, Gio
 
-settings = Gio.Settings.new('io.github.philippkosarev.bmi')
-
 # Internal imports
 from .window import BmiWindow
 from .preferences import BmiPreferences
@@ -34,6 +32,7 @@ from .preferences import BmiPreferences
 class BmiApplication(Adw.Application):
 
   def __init__(self, version: str):
+    self.settings = Gio.Settings.new('io.github.philippkosarev.bmi')
     self.version = version
     super().__init__(application_id='io.github.philippkosarev.bmi',
                      flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
@@ -43,9 +42,8 @@ class BmiApplication(Adw.Application):
 
   # Shows the preferences dialog.
   def show_preferences(self, action, param):
-    preferences = BmiPreferences(self.props.active_window, settings)
-    preferences.set_transient_for(self.props.active_window)
-    preferences.present()
+    preferences = BmiPreferences(self.settings)
+    preferences.present(self.props.active_window)
 
   # Shows the about dialog.
   def show_about(self, action, param):
@@ -84,7 +82,7 @@ class BmiApplication(Adw.Application):
     # necessary.
     self.win = self.props.active_window
     if not self.win:
-        self.win = BmiWindow(application=self, settings=settings)
+      self.win = BmiWindow(application=self, settings=self.settings)
     self.win.present()
 
   def create_action(self, name, callback, shortcuts=None):
