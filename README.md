@@ -21,14 +21,16 @@ and via <a href='https://github.com/PhilippKosarev/bmi/releases'>Github Releases
 <h1>Building</h2>
 This project is built using <a href='https://apps.gnome.org/en-GB/Builder'>Gnome Builder</a>.
 
-You can also manually run the meson commands to install and run the app natively.
-<pre>
-meson setup build
-cd build
-meson compile
-meson install
-bmi
-ninja uninstall
-</pre>
-or just run <code>./run.sh</code> which does that for you.
+<p>
+
+```
+# Native build
+./run-native.sh
+
+# Flatpak build
+./run-flatpak.sh
+```
+
+</p>
+
 </p>
