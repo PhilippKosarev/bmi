@@ -112,9 +112,10 @@ class BmiWindow(Adw.ApplicationWindow):
   whr_result_row = Gtk.Template.Child()
   bri_result_row = Gtk.Template.Child()
 
-  def __init__(self, settings, **kwargs):
+  def __init__(self, **kwargs):
     super().__init__(**kwargs)
-    self.settings = settings
+    self.get_app = self.get_application
+    settings = self.get_app().get_settings()
     # Configuring inputs
     self.input_rows = {
       'height': self.height_input_row,
@@ -124,10 +125,10 @@ class BmiWindow(Adw.ApplicationWindow):
       'waist':  self.waist_input_row,
       'hip':    self.hip_input_row,
     }
-    self.set_imperial(bool(self.settings['measurement-system']))
+    self.set_imperial(bool(settings['measurement-system']))
     for key in self.input_rows:
       row = self.input_rows.get(key)
-      value = self.settings[key]
+      value = settings[key]
       row.set_value(value)
       row.connect(row.get_signal(), self.update_inputs)
     # Configuring results
@@ -179,20 +180,21 @@ class BmiWindow(Adw.ApplicationWindow):
     self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
 
     # Setting properties from settings
-    window_width, window_height = self.settings['window-size']
+    window_width, window_height = settings['window-size']
     self.set_default_size(window_width, window_height)
-    self.set_advanced_mode(self.settings['advanced-mode'])
+    self.set_advanced_mode(settings['advanced-mode'])
 
     # Updating inputs, calculating results and setting results
     self.update_inputs()
+    settings.connect('changed', self.on_settings_changed)
 
   def on_simple_breakpoint_apply(self, adw_breakpoint = None):
-    if self.settings['advanced-mode']:
+    if self.get_app().get_settings()['advanced-mode']:
       return
     self.set_ui_orientation(horizontal)
 
   def on_simple_breakpoint_unapply(self, adw_breakpoint = None):
-    if self.settings['advanced-mode']:
+    if self.get_app().get_settings()['advanced-mode']:
       return
     self.set_ui_orientation(vertical)
 
@@ -248,22 +250,34 @@ class BmiWindow(Adw.ApplicationWindow):
     toast = Adw.Toast(title=text, timeout=1)
     self.toast_overlay.add_toast(toast)
 
-  def set_imperial(self, imperial: bool):
+  def set_imperial(self, measurement_system: int):
+    imperial = bool(measurement_system)
     for key in self.input_rows:
       row = self.input_rows.get(key)
       if row.get_name() in ('DistanceRow', 'MassRow'):
         row.set_imperial(imperial)
 
+  def on_settings_changed(self, settings: Gio.Settings, key: str):
+    update_functions = {
+      'advanced-mode': self.set_advanced_mode,
+      'measurement-system': self.set_imperial,
+    }
+    if key in update_functions:
+      function = update_functions.get(key)
+      value = settings[key]
+      function(value)
+
   # Action after closing the app window.
   def on_close_window(self, widget, *args):
+    settings = self.get_app().get_settings()
     # Setting gsettings values to adjustments to use them on next launch
-    self.settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
+    settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
     # Setting input values
-    if self.settings["remember-inputs"]:
+    if settings["remember-inputs"]:
       for key in self.input_rows:
         row = self.input_rows.get(key)
         value = row.get_value()
-        self.settings[key] = value
+        settings[key] = value
     else:
       for key in self.input_rows:
-        self.settings.reset(key)
+        settings.reset(key)

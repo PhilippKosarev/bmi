@@ -22,7 +22,7 @@
 import sys, gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
-from gi.repository import Gtk, Adw, Gio
+from gi.repository import Gtk, Adw, Gio, GObject
 
 # Internal imports
 from .window import BmiWindow
@@ -31,21 +31,34 @@ from .preferences import BmiPreferences
 # The main application singleton class
 class BmiApplication(Adw.Application):
 
+  settings = GObject.Property(
+    nick = 'settings',
+    blurb = "The application's Gio.Settings",
+    type = Gio.Settings,
+  )
+
   def __init__(self, version: str):
     super().__init__(
       application_id='io.github.philippkosarev.bmi',
       flags = Gio.ApplicationFlags.DEFAULT_FLAGS,
       version = version,
     )
-    self.settings = Gio.Settings.new(self.get_application_id())
+    self.get_id = self.get_application_id
+    self.set_settings(Gio.Settings.new(self.get_id()))
     # Application-wide shortcuts
     self.create_action('preferences', self.show_preferences, ['<primary>comma'])
     self.create_action('about', self.show_about, ['F1'])
     self.create_action('quit', self.on_quit, ['<primary>q', '<primary>w'])
 
+  def set_settings(self, settings: Gio.Settings):
+    self.settings = settings
+
+  def get_settings(self) -> Gio.Settings:
+    return self.settings
+
   # Shows the preferences dialog.
   def show_preferences(self, action, param):
-    preferences = BmiPreferences(self.settings)
+    preferences = BmiPreferences(self.get_settings())
     preferences.present(self.props.active_window)
 
   # Shows the about dialog.
@@ -53,7 +66,7 @@ class BmiApplication(Adw.Application):
     # Creating about dialog
     about = Adw.AboutDialog(
       application_name  = 'BMI',
-      application_icon  = self.get_application_id(),
+      application_icon  = self.get_id(),
       version           = self.get_version(),
       developer_name    = 'Philipp Kosarev',
       developers = [
@@ -86,7 +99,7 @@ class BmiApplication(Adw.Application):
     # We raise the application's main window, creating it if necessary.
     self.win = self.props.active_window
     if not self.win:
-      self.win = BmiWindow(application=self, settings=self.settings)
+      self.win = BmiWindow(application=self)
     self.win.present()
 
   def create_action(self, name, callback, shortcuts=None):
