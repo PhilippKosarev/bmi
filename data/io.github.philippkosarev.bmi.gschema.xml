@@ -1,45 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist gettext-domain="bmi">
-	<schema id="io.github.philippkosarev.bmi" path="/io/github/philippkosarev/bmi/">
-	  <key name="window-size" type="(ii)">
-		  <default>(360, 380)</default>
-		  <summary>Window size</summary>
-	  </key>
-	  <key name="advanced-mode" type="b">
-		  <default>false</default>
-		  <summary>Toggles Advanced Mode</summary>
-	  </key>
-	  <key name="remember-inputs" type="b">
-		  <default>true</default>
-		  <summary>Remember inputs</summary>
-	  </key>
-	  <key name="measurement-system" type="i">
-		  <default>0</default>
-		  <summary>Whether the app uses metric or imperial units</summary>
-	  </key>
-	  <key name="height" type="d">
-		  <default>175</default>
-		  <summary>Height in centimetres or inches</summary>
-	  </key>
-	  <key name="mass" type="d">
-		  <default>65</default>
-		  <summary>Weight in kilograms or pounds</summary>
-	  </key>
-	  <key name="age" type="i">
-		  <default>30</default>
-		  <summary>Years since birth</summary>
-	  </key>
-	  <key name="gender" type="s">
-		  <default>"average"</default>
-		  <summary>Biological gender</summary>
-	  </key>
-	  <key name="waist" type="d">
-		  <default>70</default>
-		  <summary>Waist circumference in centimeters</summary>
-	  </key>
-	  <key name="hip" type="d">
-		  <default>85</default>
-		  <summary>Hip circumference in centimeters</summary>
-	  </key>
-	</schema>
+  <schema id="io.github.philippkosarev.bmi" path="/io/github/philippkosarev/bmi/">
+
+    <key name="window-size" type="(ii)">
+      <default>(360, 380)</default>
+      <summary>Window size</summary>
+    </key>
+
+    <key name="advanced-mode" type="b">
+      <default>false</default>
+      <summary>Toggles Advanced Mode</summary>
+    </key>
+
+    <key name="remember-inputs" type="b">
+      <default>true</default>
+      <summary>Remember inputs</summary>
+    </key>
+
+    <key name="measurement-system" type="i">
+      <default>0</default>
+      <summary>Whether the app uses metric or imperial units</summary>
+    </key>
+
+    <key name="height" type="d">
+      <default>175</default>
+      <summary>Height in centimetres or inches</summary>
+    </key>
+
+    <key name="mass" type="d">
+      <default>65</default>
+      <summary>Weight in kilograms or pounds</summary>
+    </key>
+
+    <key name="age" type="i">
+      <default>30</default>
+      <summary>Years since birth</summary>
+    </key>
+
+    <key name="gender" type="i">
+      <default>0</default>
+      <summary>Biological gender</summary>
+    </key>
+
+    <key name="waist" type="d">
+      <default>70</default>
+      <summary>Waist circumference in centimeters</summary>
+    </key>
+
+    <key name="hip" type="d">
+      <default>85</default>
+      <summary>Hip circumference in centimeters</summary>
+    </key>
+
+  </schema>
 </schemalist>

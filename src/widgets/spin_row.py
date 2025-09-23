@@ -1,9 +1,8 @@
 # Imports
 from gi.repository import GObject, Gtk, Adw
 
-# Biggest and smallest signed integers GTK accepts
+# Biggest signed integer GTK accepts
 max_size = 2_147_483_647
-min_size = -max_size
 
 # Shorthand vars
 center = Gtk.Align.CENTER
@@ -12,10 +11,9 @@ class SpinRow(Adw.ActionRow):
   __gtype_name__ = 'SpinRow'
 
   value = GObject.Property(type=int, default=0)
-  lower = GObject.Property(type=int, default=min_size)
   upper = GObject.Property(type=int, default=max_size)
+  lower = GObject.Property(type=int, default=-max_size)
   digits = GObject.Property(type=int, default=1)
-  callback = None
 
   def __init__(self, **kwargs):
     super().__init__(**kwargs)
@@ -27,7 +25,12 @@ class SpinRow(Adw.ActionRow):
     self.step_increment = 1
     self.page_increment = 10
     self.adjustment = Gtk.Adjustment.new(
-      self.value, self.lower, self.upper, self.step_increment, self.page_increment, 0,
+      self.value,
+      self.lower,
+      self.upper,
+      self.step_increment,
+      self.page_increment,
+      0,
     )
     self.spin_button = Gtk.SpinButton(xalign=1, valign=center, hexpand=True)
     self.spin_button.configure(self.adjustment, climb_rate, self.digits)
@@ -42,7 +45,12 @@ class SpinRow(Adw.ActionRow):
 
   def configure(self, row, param):
     self.adjustment.configure(
-      self.value, self.lower, self.upper, self.step_increment, self.page_increment, 0
+      self.value,
+      self.lower,
+      self.upper,
+      self.step_increment,
+      self.page_increment,
+      0,
     )
     lower_width_chars = len(str(self.lower)) + self.digits
     upper_width_chars = len(str(self.upper)) + self.digits
@@ -63,12 +71,11 @@ class SpinRow(Adw.ActionRow):
   def update_digits(self, row, param):
     self.spin_button.set_digits(self.digits)
 
-  def set_callback(self, callback):
-    self.callback = callback
-
-  def on_value_changed(self, spin_button):
-    if self.callback is not None:
-      self.callback(self)
-
   def get_name(self):
     return self.__class__.__name__
+
+  def on_value_changed(self, spin_button):
+    self.value = spin_button.get_value()
+
+  def get_signal(self):
+    return 'notify::value'

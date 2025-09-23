@@ -8,7 +8,6 @@ class Calculator:
   def bmi(self, inputs: dict):
     return inputs.get('mass') / ((inputs.get('height') / 100) ** 2)
 
-
   # Returns Waist To Height Ratio
   def whtr(self, inputs: dict) -> float:
     waist = inputs.get('waist')
@@ -29,18 +28,18 @@ class Calculator:
   def whr_overweight(self, inputs: dict) -> float:
     gender = inputs.get('gender')
     thresholds_by_gender = {
-      'average': 0.85,
-      'female': 0.8,
-      'male': 0.9,
+      0: 0.85,
+      1: 0.8,
+      2: 0.9,
     }
     return thresholds_by_gender.get(gender)
   # Returns obese threshold for WHR
   def whr_obese(self, inputs: dict) -> float:
     gender = inputs.get('gender')
     thresholds_by_gender = {
-      'average': 0.925,
-      'female': 0.85,
-      'male': 1,
+      0: 0.925,
+      1: 0.85,
+      2: 1,
     }
     return thresholds_by_gender.get(gender)
 

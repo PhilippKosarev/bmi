@@ -32,10 +32,13 @@ from .preferences import BmiPreferences
 class BmiApplication(Adw.Application):
 
   def __init__(self, version: str):
-    self.settings = Gio.Settings.new('io.github.philippkosarev.bmi')
-    self.version = version
-    super().__init__(application_id='io.github.philippkosarev.bmi',
-                     flags=Gio.ApplicationFlags.DEFAULT_FLAGS)
+    super().__init__(
+      application_id='io.github.philippkosarev.bmi',
+      flags = Gio.ApplicationFlags.DEFAULT_FLAGS,
+      version = version,
+    )
+    self.settings = Gio.Settings.new(self.get_application_id())
+    # Application-wide shortcuts
     self.create_action('preferences', self.show_preferences, ['<primary>comma'])
     self.create_action('about', self.show_about, ['F1'])
     self.create_action('quit', self.on_quit, ['<primary>q', '<primary>w'])
@@ -49,37 +52,38 @@ class BmiApplication(Adw.Application):
   def show_about(self, action, param):
     # Creating about dialog
     about = Adw.AboutDialog(
-      application_name   = 'BMI',
-      application_icon   = 'io.github.philippkosarev.bmi',
-      version            = self.version,
-      developer_name     = 'Philipp Kosarev',
-      developers         = [
+      application_name  = 'BMI',
+      application_icon  = self.get_application_id(),
+      version           = self.get_version(),
+      developer_name    = 'Philipp Kosarev',
+      developers = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
         'vikdevelop https://github.com/vikdevelop',
       ],
-      artists            = [
+      artists = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
       ],
-      copyright          = '© 2024 Philipp Kosarev',
-      license_type       = 'GTK_LICENSE_GPL_2_0',
-      website            = "https://github.com/philippkosarev/bmi",
-      issue_url          = "https://github.com/philippkosarev/bmi/issues",
+      copyright    = '© 2024 Philipp Kosarev',
+      license_type = 'GTK_LICENSE_GPL_2_0',
+      website      = "https://github.com/philippkosarev/bmi",
+      issue_url    = "https://github.com/philippkosarev/bmi/issues",
     )
-    about.add_credit_section(_("Translators"), [
+    about.add_credit_section(
+      _("Translators"),
+      [
         'Sultaniiazov David https://github.com/x1z53',
         'Maksym Dilanian https://github.com/maksym-dilanian',
-      ]
+      ],
     )
     about.present(self.props.active_window)
 
   def on_quit(self, action, param):
-    self.win.on_close_window(widget="")
+    self.win.on_close_window(widget='')
     self.quit()
 
   # Called when the application is activated.
   def do_activate(self):
-    # We raise the application's main window, creating it if
-    # necessary.
+    # We raise the application's main window, creating it if necessary.
     self.win = self.props.active_window
     if not self.win:
       self.win = BmiWindow(application=self, settings=self.settings)
@@ -87,10 +91,10 @@ class BmiApplication(Adw.Application):
 
   def create_action(self, name, callback, shortcuts=None):
     action = Gio.SimpleAction.new(name, None)
-    action.connect("activate", callback)
+    action.connect('activate', callback)
     self.add_action(action)
     if shortcuts:
-        self.set_accels_for_action(f"app.{name}", shortcuts)
+      self.set_accels_for_action(f'app.{name}', shortcuts)
 
 # The application's entry point.
 def main(version):
