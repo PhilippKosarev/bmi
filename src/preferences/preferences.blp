@@ -7,35 +7,26 @@ template $BmiPreferences: Adw.PreferencesDialog {
   Adw.PreferencesPage {
     title: _("Preferences");
 
-    Adw.PreferencesGroup {
-      title: _("Input");
-
-      $PreferencesSwitch advanced_mode_row {
+    $Group {
+      $SwitchRow {
         title: _("Advanced mode");
-        [prefix]
-        Image {
-          icon-name: "accessories-calculator-symbolic";
-        }
+        icon-name: "accessories-calculator-symbolic";
+        key: "advanced-mode";
       }
-
-      Adw.ComboRow measurement_system_row {
+      $DropDownRow {
         title: _("Measurement system");
+        icon-name: "ruler-angled-symbolic";
+        key: "measurement-system";
         model: StringList {
           strings [_("Metric"), _("Imperial")]
         };
-        [prefix]
-        Image {
-          icon-name: "ruler-angled-symbolic";
-        }
+      }
+      $SwitchRow {
+        title: _("Remember inputs");
+        icon-name: "user-bookmarks-symbolic";
+        key: "advanced-mode";
       }
 
-      $PreferencesSwitch remember_inputs_row {
-        title: _("Remember inputs");
-        [prefix]
-        Image {
-          icon-name: "user-bookmarks-symbolic";
-        }
-      }
     }
   }
 }

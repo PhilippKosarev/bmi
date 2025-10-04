@@ -58,7 +58,8 @@ class BmiApplication(Adw.Application):
 
   # Shows the preferences dialog.
   def show_preferences(self, action, param):
-    preferences = BmiPreferences(self.get_settings())
+    preferences = BmiPreferences()
+    preferences.set_settings(self.get_settings())
     preferences.present(self.props.active_window)
 
   # Shows the about dialog.

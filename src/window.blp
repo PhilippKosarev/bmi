@@ -44,15 +44,15 @@ template $BmiWindow: Adw.ApplicationWindow {
                 title: _("Inputs");
                 $DistanceRow height_input_row {
                   title: _("Height");
+                  tooltip-text: _("Affects BMI and BRI");
                   lower: 10;
                   upper: 999;
-                  tooltip-text: _("Affects BMI and BRI");
                 }
                 $MassRow weight_input_row {
                   title: _("Weight");
+                  tooltip-text: _("Affects BMI");
                   lower: 10;
                   upper: 999;
-                  tooltip-text: _("Affects BMI");
                 }
               }
             }

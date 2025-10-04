@@ -44,14 +44,19 @@ bmi_sources = [
   'calculator.py',
   # Preferences
   'preferences/preferences.py',
-  'preferences/preferences_switch.py',
   # Widgets
+  'widgets/shared.py',
+  'widgets/group.py',
   'widgets/spin_row.py',
   'widgets/distance_row.py',
   'widgets/mass_row.py',
   'widgets/time_row.py',
   'widgets/gender_row.py',
   'widgets/result_row.py',
+  # Rows
+  'rows/base_row.py',
+  'rows/switch_row.py',
+  'rows/dropdown_row.py',
 ]
 
 install_data(bmi_sources, install_dir: moduledir)
