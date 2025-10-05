@@ -6,6 +6,7 @@
     <file>window/window.ui</file>
     <file>preferences/preferences.ui</file>
     <file>widgets/result_row.ui</file>
+    <file>widgets/result_dialog.ui</file>
     <!-- CSS -->
     <file>style.css</file>
     <!-- Icons -->

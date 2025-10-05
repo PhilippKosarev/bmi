@@ -109,6 +109,7 @@ class BmiWindow(Adw.ApplicationWindow):
     ]
     for row in self.result_rows:
       row.connect('activated', self.copy_result)
+      row.connect('info-clicked', self.on_result_row_info_clicked)
     self.result_row_info = {
       self.bmi_result_row: {
         'calc-function': calc.bmi,
@@ -203,7 +204,7 @@ class BmiWindow(Adw.ApplicationWindow):
     self.bri_result_row.set_visible(mode)
     self.update_breakpoints()
 
-  def update_results(self, *args):
+  def get_inputs(self):
     settings = self.get_app().get_settings()
     inputs = {}
     for row in self.input_rows:
@@ -219,24 +220,37 @@ class BmiWindow(Adw.ApplicationWindow):
         settings[key] = value
       else:
         settings.reset(key)
+    return inputs
+
+  def calc_row_values(self, row: widgets.ResultRow, inputs: dict) -> tuple:
+    info = self.result_row_info.get(row)
+    calc_function = info.get('calc-function')
+    thresholds = info.get('thresholds')
+    result = calc_function(inputs)
+    for i in range(len(thresholds)):
+      threshold = thresholds[i]
+      value = threshold.get('value')
+      if callable(value):
+        thresholds[i]['value'] = value(inputs)
+    return result, thresholds
+
+  def update_results(self, *args):
+    inputs = self.get_inputs()
     for row in self.result_row_info:
-      # info
-      info = self.result_row_info.get(row)
-      # result
-      calc_function = info.get('calc-function')
-      result = calc_function(inputs)
+      result, thresholds = self.calc_row_values(row, inputs)
       row.set_result(result)
-      # thresholds
-      thresholds = info.get('thresholds')
-      for i in range(len(thresholds)):
-        threshold = thresholds[i]
-        value = threshold.get('value')
-        if callable(value):
-          thresholds[i]['value'] = value(inputs)
       row.set_feedback(result, thresholds)
 
+  def on_result_row_info_clicked(self, row: widgets.ResultRow, button: Gtk.Button):
+    dialog = widgets.ResultDialog(row)
+    inputs = self.get_inputs()
+    result, thresholds = self.calc_row_values(row, inputs)
+    dialog.set_result(result)
+    dialog.set_feedback(result, thresholds)
+    dialog.present(self)
+
   def copy_result(self, row: widgets.ResultRow):
-    value = str(row.get_value())
+    value = str(row.get_title())
     Gdk.Clipboard.set(clipboard, value);
     self.show_toast(_("Result copied"))
 

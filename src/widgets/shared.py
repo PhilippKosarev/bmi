@@ -2,13 +2,20 @@
 from gi.repository import Gtk, Adw, Gio
 from enum import Enum
 
-# Enums:
+# Variables:
 
 # Should always be in the same order as the StringList of gender_input_row.
 class Gender(Enum):
   AVERAGE = 0
   FEMALE = 1
   MALE = 2
+
+styles = [
+  'light-blue',
+  'success',
+  'warning',
+  'error',
+]
 
 # Functions:
 
@@ -48,3 +55,9 @@ def set_settings_value(settings: Gio.Settings, key: str, value):
   }
   function = functions.get(type(value))
   return function(key, value)
+
+def set_style(widget: Gtk.Widget, style_index: int):
+  for style in styles:
+    widget.remove_css_class(style)
+  if style_index is not None:
+    widget.add_css_class(styles[style_index])

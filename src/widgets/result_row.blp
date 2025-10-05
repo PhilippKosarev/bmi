@@ -18,19 +18,3 @@ template $ResultRow: Adw.ActionRow {
     icon-name: "help-about-symbolic";
   }
 }
-
-Adw.Dialog info_dialog {
-  content-width: 400;
-  vexpand: true;
-  Adw.ToolbarView {
-    [top]
-    Adw.HeaderBar {}
-    content: Box {
-      Adw.PreferencesPage info_page {
-        Adw.PreferencesGroup thresholds_group {
-          title: _("Thresholds");
-        }
-      }
-    };
-  }
-}

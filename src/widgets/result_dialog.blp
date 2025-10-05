@@ -1,0 +1,41 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $ResultDialog: Adw.Dialog {
+  content-width: 400;
+  Adw.ToolbarView {
+    [top]
+    Adw.HeaderBar {}
+    content: ScrolledWindow {
+      propagate-natural-height: true;
+      Box {
+        margin-top: 4;
+        margin-bottom: 16;
+        margin-start: 16;
+        margin-end: 16;
+        orientation: vertical;
+        spacing: 16;
+        Adw.PreferencesGroup {
+          title: _("Result");
+          Box {
+            margin-top: 4;
+            styles ["card"]
+            orientation: vertical;
+            spacing: 6;
+            Label result_label {
+              margin-top: 12;
+              styles ["title-1"]
+            }
+            Label feedback_label {
+              margin-bottom: 12;
+              styles ["heading"]
+            }
+          }
+        }
+        Adw.PreferencesGroup thresholds_group {
+          title: _("Thresholds");
+        }
+      }
+    };
+  }
+}

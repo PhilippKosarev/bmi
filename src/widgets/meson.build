@@ -1,7 +1,7 @@
 widget_sources = [
   '__init__.py',
   'shared.py',
-  # Input rows
+  # Input
   'base_row.py',
   'switch_row.py',
   'dropdown_row.py',
@@ -9,8 +9,9 @@ widget_sources = [
   'distance_row.py',
   'mass_row.py',
   'time_row.py',
-  # Output rows
+  # Output
   'result_row.py',
+  'result_dialog.py',
   # Other
   'group.py',
 ]

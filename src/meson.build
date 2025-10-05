@@ -4,9 +4,12 @@ gnome = import('gnome')
 
 blueprints = custom_target('blueprints',
   input: files(
+    # Main
     'window/window.blp',
     'preferences/preferences.blp',
+    # Widgets
     'widgets/result_row.blp',
+    'widgets/result_dialog.blp',
   ),
   output: '.',
   command: [find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@'],
