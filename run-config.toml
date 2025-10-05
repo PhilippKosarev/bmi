@@ -1,0 +1,22 @@
+[config]
+bin = "bmi"
+build-dir = "./build"
+prefix = "~/.local"
+manifest = "io.github.philippkosarev.bmi.json"
+
+[builds.native]
+building = [
+  "meson setup $build-dir --prefix=$prefix",
+  "meson compile -C $build-dir",
+  "meson install -C $build-dir",
+]
+running = "$bin"
+uninstalling = [
+  "ninja uninstall -C $build-dir",
+]
+
+[builds.flatpak]
+building = [
+  "flatpak-builder --force-clean $build-dir $manifest",
+]
+running = "flatpak-builder --run $build-dir $manifest $bin"

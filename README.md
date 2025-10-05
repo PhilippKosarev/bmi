@@ -5,7 +5,7 @@ BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita
 <img width='640' alt='Download on Flathub' src='screenshots/advanced-dark.png'/>
 
 <p>
-<h1>Installing</h2>
+<h2>Installing</h2>
 <p>
 Available on <a href='https://flathub.org/apps/details/io.github.philippkosarev.bmi'>Flathub</a>.
 </a>
@@ -18,19 +18,21 @@ and via <a href='https://github.com/PhilippKosarev/bmi/releases'>Github Releases
 </p>
 
 <p>
-<h1>Building</h2>
+<h2>Building</h2>
 This project is built using <a href='https://apps.gnome.org/en-GB/Builder'>Gnome Builder</a>.
 
-<p>
+<h3>Dependencies</h3>
 
+- python
+- PyGObject
+- blueprint-compiler
+- flatpak-builder
+
+<h3>Running</h3>
+
+Use the project's runner script:
+```sh
+./run native # Native build
+./run flatpak # Flatpak build
 ```
-# Native build
-./run-native.sh
-
-# Flatpak build
-./run-flatpak.sh
-```
-
-</p>
-
-</p>
+or manually run the commands from `run-config.toml`.
