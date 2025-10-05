@@ -228,6 +228,8 @@ class BmiWindow(Adw.ApplicationWindow):
       inputs[key] = value
       if settings['remember-inputs']:
         settings[key] = value
+      else:
+        settings.reset(key)
     for row in self.result_rows:
       row.update(inputs)
 
@@ -252,6 +254,7 @@ class BmiWindow(Adw.ApplicationWindow):
     update_functions = {
       'advanced-mode': self.set_advanced_mode,
       'measurement-system': self.set_imperial,
+      'remember-inputs': self.update_results,
     }
     if key in update_functions:
       function = update_functions.get(key)
@@ -260,11 +263,4 @@ class BmiWindow(Adw.ApplicationWindow):
 
   # Action after closing the app window.
   def on_close_request(self, *args):
-    settings = self.get_app().get_settings()
-    # Setting gsettings values to adjustments to use them on next launch
-    settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
-    # Setting input values
-    if not settings["remember-inputs"]:
-      for row in self.input_rows:
-        key = row.get_key()
-        settings.reset(key)
+    settings['window-size'] = self.get_size(horizontal), self.get_size(vertical)
