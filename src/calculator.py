@@ -54,5 +54,5 @@ class Calculator:
       bri = 364.2 - (365.5 * math.sqrt((1 - (waist / (math.pi * height)) ** 2)))
     except (ZeroDivisionError, ValueError):
       # Sometimes sqrt() errors out due to trying to sqrt a negative number
-      bri = 'Error'
+      bri = None
     return bri

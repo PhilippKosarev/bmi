@@ -24,13 +24,11 @@ import math, re
 
 # Internal imports
 from . import widgets
-from .widgets.shared import *
 from .calculator import Calculator
-calc = Calculator()
-
-clipboard = Gdk.Display.get_default().get_clipboard()
 
 # Shorthand vars
+calc = Calculator()
+clipboard = Gdk.Display.get_default().get_clipboard()
 horizontal = Gtk.Orientation.HORIZONTAL
 vertical = Gtk.Orientation.VERTICAL
 adw_lenght_units = {
@@ -60,20 +58,6 @@ def eval_breakpoint(window, adw_breakpoint):
       return False
   return True
 
-def get_nth_child(parent, n):
-  child = parent.get_first_child()
-  for widget in range(n-1):
-    child = child.get_first_child()
-  return child
-
-def get_groups(page):
-  group = get_nth_child(page, 5).get_next_sibling()
-  groups = [group]
-  while True:
-    group = group.get_next_sibling()
-    if group is None:
-      return groups
-    groups.append(group)
 
 @Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window/window.ui')
 class BmiWindow(Adw.ApplicationWindow):
@@ -124,55 +108,60 @@ class BmiWindow(Adw.ApplicationWindow):
       self.bri_result_row,
     ]
     for row in self.result_rows:
-      row.set_callback(self.copy_result)
-    # Setting result thresholds and calc functions
-    self.bmi_result_row.set_calc_func(calc.bmi)
-    self.bmi_result_row.set_thresholds([
-      {'text': _('Underweight [Severe]'),   'value': 0,    'style': 0},
-      {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 0},
-      {'text': _('Underweight [Mild]'),     'value': 17,   'style': 0},
-      {'text': _('Healthy'),                'value': 18.5, 'style': 1},
-      {'text': _('Overweight'),             'value': 25,   'style': 2},
-      {'text': _('Obese [Class 1]'),        'value': 30,   'style': 3},
-      {'text': _('Obese [Class 2]'),        'value': 35,   'style': 3},
-      {'text': _('Obese [Class 3]'),        'value': 40,   'style': 3},
-    ])
-    self.whtr_result_row.set_calc_func(calc.whtr)
-    self.whtr_result_row.set_thresholds([
-      {'text': _('Healthy'),   'value': 0,                   'style': 1},
-      {'text': _('Unhealthy'), 'value': calc.whtr_unhealthy, 'style': 2},
-    ])
-    self.whr_result_row.set_calc_func(calc.whr)
-    self.whr_result_row.set_thresholds([
-      {'text': _('Healthy'),    'value': 0,                   'style': 1},
-      {'text': _('Overweight'), 'value': calc.whr_overweight, 'style': 2},
-      {'text': _('Obese'),      'value': calc.whr_obese,      'style': 3},
-    ])
-    self.bri_result_row.set_calc_func(calc.bri)
-    self.bri_result_row.set_thresholds([
-      {'text': _('Very lean'),     'value': 0,    'style': 0},
-      {'text': _('Lean'),          'value': 3.41, 'style': 1},
-      {'text': _('Average'),       'value': 4.45, 'style': 1},
-      {'text': _('Above average'), 'value': 5.46, 'style': 2},
-      {'text': _('High'),          'value': 6.91, 'style': 3},
-    ])
-
+      row.connect('activated', self.copy_result)
+    self.result_row_info = {
+      self.bmi_result_row: {
+        'calc-function': calc.bmi,
+        'thresholds': [
+          {'text': _('Underweight [Severe]'),   'value': 0,    'style': 0},
+          {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 0},
+          {'text': _('Underweight [Mild]'),     'value': 17,   'style': 0},
+          {'text': _('Healthy'),                'value': 18.5, 'style': 1},
+          {'text': _('Overweight'),             'value': 25,   'style': 2},
+          {'text': _('Obese [Class 1]'),        'value': 30,   'style': 3},
+          {'text': _('Obese [Class 2]'),        'value': 35,   'style': 3},
+          {'text': _('Obese [Class 3]'),        'value': 40,   'style': 3},
+        ],
+      },
+      self.whtr_result_row: {
+        'calc-function': calc.whtr,
+        'thresholds': [
+          {'text': _('Healthy'),   'value': 0,                   'style': 1},
+          {'text': _('Unhealthy'), 'value': calc.whtr_unhealthy, 'style': 2},
+        ],
+      },
+      self.whr_result_row: {
+        'calc-function': calc.whtr,
+        'thresholds': [
+          {'text': _('Healthy'),    'value': 0,                   'style': 1},
+          {'text': _('Overweight'), 'value': calc.whr_overweight, 'style': 2},
+          {'text': _('Obese'),      'value': calc.whr_obese,      'style': 3},
+        ],
+      },
+      self.bri_result_row: {
+        'calc-function': calc.bri,
+        'thresholds': [
+          {'text': _('Very lean'),     'value': 0,    'style': 0},
+          {'text': _('Lean'),          'value': 3.41, 'style': 1},
+          {'text': _('Average'),       'value': 4.45, 'style': 1},
+          {'text': _('Above average'), 'value': 5.46, 'style': 2},
+          {'text': _('High'),          'value': 6.91, 'style': 3},
+        ],
+      },
+    }
+    # Setting stuff from settings
+    window_width, window_height = settings['window-size']
+    self.set_default_size(window_width, window_height)
+    self.set_advanced_mode(settings['advanced-mode'])
+    self.set_imperial(settings['measurement-system'])
+    self.update_results()
     # Connecting stuff
-    self.connect("close-request", self.on_close_request)
+    settings.connect('changed', self.on_settings_changed)
     self.simple_breakpoint.connect('apply', self.on_simple_breakpoint_apply)
     self.simple_breakpoint.connect('unapply', self.on_simple_breakpoint_unapply)
     self.advanced_breakpoint.connect('apply', self.on_advanced_breakpoint_apply)
     self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
-
-    # Setting properties from settings
-    self.set_imperial(bool(settings['measurement-system']))
-    window_width, window_height = settings['window-size']
-    self.set_default_size(window_width, window_height)
-    self.set_advanced_mode(settings['advanced-mode'])
-
-    # Updating inputs, calculating results and setting results
-    self.update_results()
-    settings.connect('changed', self.on_settings_changed)
+    self.connect("close-request", self.on_close_request)
 
   def on_simple_breakpoint_apply(self, adw_breakpoint = None):
     if self.get_app().get_settings()['advanced-mode']:
@@ -230,10 +219,23 @@ class BmiWindow(Adw.ApplicationWindow):
         settings[key] = value
       else:
         settings.reset(key)
-    for row in self.result_rows:
-      row.update(inputs)
+    for row in self.result_row_info:
+      # info
+      info = self.result_row_info.get(row)
+      # result
+      calc_function = info.get('calc-function')
+      result = calc_function(inputs)
+      row.set_result(result)
+      # thresholds
+      thresholds = info.get('thresholds')
+      for i in range(len(thresholds)):
+        threshold = thresholds[i]
+        value = threshold.get('value')
+        if callable(value):
+          thresholds[i]['value'] = value(inputs)
+      row.set_feedback(result, thresholds)
 
-  def copy_result(self, row):
+  def copy_result(self, row: widgets.ResultRow):
     value = str(row.get_value())
     Gdk.Clipboard.set(clipboard, value);
     self.show_toast(_("Result copied"))
