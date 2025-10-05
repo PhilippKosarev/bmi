@@ -1,13 +1,16 @@
 # Imports
 from gi.repository import GObject, Gtk, Adw
 
+# Internal imports
+from .base_row import BaseRow
+
 # Biggest signed integer GTK accepts
 max_size = 2_147_483_647
 
 # Shorthand vars
 center = Gtk.Align.CENTER
 
-class SpinRow(Adw.ActionRow):
+class SpinRow(BaseRow):
   __gtype_name__ = 'SpinRow'
 
   value = GObject.Property(type=int, default=0)

@@ -20,22 +20,6 @@ class MassRow(SpinRow):
     super().__init__(**kwargs)
     self.set_subtitle(_('Kilograms'))
 
-  # def update_range(self):
-  #   if self.imperial:
-  #     lower = self.value_range.get('lower').get('imperial')
-  #     upper = self.value_range.get('upper').get('imperial')
-  #   else:
-  #     lower = self.value_range.get('lower').get('metric')
-  #     upper = self.value_range.get('upper').get('metric')
-  #   self.row.set_range(lower, upper)
-
-  # def set_range(self, lower, upper):
-  #   self.value_range = {
-  #     'lower': {'metric': lower, 'imperial': round(kg_to_lb(lower), 0)},
-  #     'upper': {'metric': upper, 'imperial': round(kg_to_lb(upper), 0)},
-  #   }
-  #   self.update_range()
-
   def get_kilograms(self):
     if self.imperial:
       return lb_to_kg(self.get_value())
@@ -60,5 +44,4 @@ class MassRow(SpinRow):
       self.set_subtitle(_('Kilograms'))
     value = round(value, 0)
     self.imperial = imperial
-    # self.update_range()
     self.set_value(value)

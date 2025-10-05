@@ -3,7 +3,7 @@
   <gresource prefix="/io/github/philippkosarev/bmi">
 
     <!-- UI files -->
-    <file>window.ui</file>
+    <file>window/window.ui</file>
     <file>preferences/preferences.ui</file>
     <file>widgets/result_row.ui</file>
     <!-- CSS -->

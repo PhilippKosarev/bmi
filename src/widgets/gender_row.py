@@ -2,8 +2,11 @@
 from gi.repository import Gtk, Adw
 from enum import Enum
 
+# Internal imports
+from .dropdown_row import DropDownRow
+
 # Class
-class GenderRow(Adw.ComboRow):
+class GenderRow(DropDownRow):
   __gtype_name__ = 'GenderRow'
   def __init__(self, **kwargs):
     super().__init__(**kwargs)

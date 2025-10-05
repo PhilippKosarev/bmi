@@ -2,10 +2,8 @@
 from gi.repository import Gtk, Adw, Gio, GObject
 
 # Internal imports
-from .shared import *
-from .group import Group
-from .switch_row import SwitchRow
-from .dropdown_row import DropDownRow
+from . import widgets
+from .widgets.shared import *
 
 # Internal functions
 def on_settings_changed(self, param):

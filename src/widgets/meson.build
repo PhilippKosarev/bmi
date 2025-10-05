@@ -1,21 +1,19 @@
-pkgdatadir = get_option('prefix') / get_option('datadir') / meson.project_name()
-moduledir = pkgdatadir / 'bmi' / 'widgets'
-
 widget_sources = [
   '__init__.py',
-  'widgets/shared.py',
-  'widgets/preferences_dialog.py',
-  'widgets/page.py',
-  'widgets/group.py',
-  'widgets/spin_row.py',
-  'widgets/distance_row.py',
-  'widgets/mass_row.py',
-  'widgets/time_row.py',
-  'widgets/gender_row.py',
-  'widgets/result_row.py',
-  'rows/base_row.py',
-  'rows/switch_row.py',
-  'rows/dropdown_row.py',
+  'shared.py',
+  # Input rows
+  'base_row.py',
+  'switch_row.py',
+  'dropdown_row.py',
+  'gender_row.py',
+  'spin_row.py',
+  'distance_row.py',
+  'mass_row.py',
+  'time_row.py',
+  # Output rows
+  'result_row.py',
+  # Other
+  'group.py',
 ]
 
-install_data(bmi_sources, install_dir: moduledir)
+install_data(widget_sources, install_dir: moduledir / 'widgets')

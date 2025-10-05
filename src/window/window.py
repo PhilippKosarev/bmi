@@ -23,19 +23,16 @@ from gi.repository import Gtk, Adw, Gio, Gdk
 import math, re
 
 # Internal imports
-from .distance_row import DistanceRow
-from .mass_row import MassRow
-from .time_row import TimeRow
-from .gender_row import GenderRow
-from .result_row import ResultRow
+from . import widgets
+from .widgets.shared import *
 from .calculator import Calculator
 calc = Calculator()
 
 clipboard = Gdk.Display.get_default().get_clipboard()
 
 # Shorthand vars
-vertical = Gtk.Orientation.VERTICAL
 horizontal = Gtk.Orientation.HORIZONTAL
+vertical = Gtk.Orientation.VERTICAL
 adw_lenght_units = {
   'px': Adw.LengthUnit.PX,
   'sp': Adw.LengthUnit.SP,
@@ -78,17 +75,7 @@ def get_groups(page):
       return groups
     groups.append(group)
 
-def get_metric_row_value(row):
-  row_name = row.get_name()
-  if row_name == 'DistanceRow':
-    value = row.get_centimetres()
-  elif row_name == 'MassRow':
-    value = row.get_kilograms()
-  else:
-    value = row.get_value()
-  return value
-
-@Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window.ui')
+@Gtk.Template(resource_path='/io/github/philippkosarev/bmi/window/window.ui')
 class BmiWindow(Adw.ApplicationWindow):
   __gtype_name__ = 'BmiWindow'
 
@@ -117,20 +104,18 @@ class BmiWindow(Adw.ApplicationWindow):
     self.get_app = self.get_application
     settings = self.get_app().get_settings()
     # Configuring inputs
-    self.input_rows = {
-      'height': self.height_input_row,
-      'mass':   self.weight_input_row,
-      'gender': self.gender_input_row,
-      'age':    self.age_input_row,
-      'waist':  self.waist_input_row,
-      'hip':    self.hip_input_row,
-    }
-    self.set_imperial(bool(settings['measurement-system']))
-    for key in self.input_rows:
-      row = self.input_rows.get(key)
-      value = settings[key]
-      row.set_value(value)
-      row.connect(row.get_signal(), self.update_inputs)
+    self.input_rows = [
+      self.height_input_row,
+      self.weight_input_row,
+      self.gender_input_row,
+      self.age_input_row,
+      self.waist_input_row,
+      self.hip_input_row,
+    ]
+    for row in self.input_rows:
+      key = row.get_key()
+      row.set_value(settings[key])
+      row.connect(row.get_signal(), self.update_results)
     # Configuring results
     self.result_rows = [
       self.bmi_result_row,
@@ -173,19 +158,20 @@ class BmiWindow(Adw.ApplicationWindow):
     ])
 
     # Connecting stuff
-    self.connect("close-request", self.on_close_window)
+    self.connect("close-request", self.on_close_request)
     self.simple_breakpoint.connect('apply', self.on_simple_breakpoint_apply)
     self.simple_breakpoint.connect('unapply', self.on_simple_breakpoint_unapply)
     self.advanced_breakpoint.connect('apply', self.on_advanced_breakpoint_apply)
     self.advanced_breakpoint.connect('unapply', self.on_advanced_breakpoint_unapply)
 
     # Setting properties from settings
+    self.set_imperial(bool(settings['measurement-system']))
     window_width, window_height = settings['window-size']
     self.set_default_size(window_width, window_height)
     self.set_advanced_mode(settings['advanced-mode'])
 
     # Updating inputs, calculating results and setting results
-    self.update_inputs()
+    self.update_results()
     settings.connect('changed', self.on_settings_changed)
 
   def on_simple_breakpoint_apply(self, adw_breakpoint = None):
@@ -228,15 +214,20 @@ class BmiWindow(Adw.ApplicationWindow):
     self.bri_result_row.set_visible(mode)
     self.update_breakpoints()
 
-  def update_inputs(self, *args):
+  def update_results(self, *args):
+    settings = self.get_app().get_settings()
     inputs = {}
-    for key in self.input_rows:
-      row = self.input_rows.get(key)
-      value = get_metric_row_value(row)
+    for row in self.input_rows:
+      if hasattr(row, 'get_centimetres'):
+        value = row.get_centimetres()
+      elif hasattr(row, 'get_kilograms'):
+        value = row.get_kilograms()
+      else:
+        value = row.get_value()
+      key = row.get_key()
       inputs[key] = value
-    self.update_results(inputs)
-
-  def update_results(self, inputs: dict):
+      if settings['remember-inputs']:
+        settings[key] = value
     for row in self.result_rows:
       row.update(inputs)
 
@@ -252,11 +243,11 @@ class BmiWindow(Adw.ApplicationWindow):
 
   def set_imperial(self, measurement_system: int):
     imperial = bool(measurement_system)
-    for key in self.input_rows:
-      row = self.input_rows.get(key)
-      if row.get_name() in ('DistanceRow', 'MassRow'):
+    for row in self.input_rows:
+      if hasattr(row, 'imperial'):
         row.set_imperial(imperial)
 
+  # Handles changes to settings.
   def on_settings_changed(self, settings: Gio.Settings, key: str):
     update_functions = {
       'advanced-mode': self.set_advanced_mode,
@@ -268,16 +259,12 @@ class BmiWindow(Adw.ApplicationWindow):
       function(value)
 
   # Action after closing the app window.
-  def on_close_window(self, widget, *args):
+  def on_close_request(self, *args):
     settings = self.get_app().get_settings()
     # Setting gsettings values to adjustments to use them on next launch
     settings['window-size'] = (self.get_size(horizontal), self.get_size(vertical))
     # Setting input values
-    if settings["remember-inputs"]:
-      for key in self.input_rows:
-        row = self.input_rows.get(key)
-        value = row.get_value()
-        settings[key] = value
-    else:
-      for key in self.input_rows:
+    if not settings["remember-inputs"]:
+      for row in self.input_rows:
+        key = row.get_key()
         settings.reset(key)
