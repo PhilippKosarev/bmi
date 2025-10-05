@@ -1,6 +1,9 @@
 # Imports
 import math
 
+# Internal imports
+from .widgets.shared import *
+
 # Class
 class Calculator:
 
@@ -26,20 +29,20 @@ class Calculator:
     return inputs.get('waist') / inputs.get('hip')
   # Returns overweight threshold for WHR
   def whr_overweight(self, inputs: dict) -> float:
-    gender = inputs.get('gender')
+    gender = Gender(inputs.get('gender'))
     thresholds_by_gender = {
-      0: 0.85,
-      1: 0.8,
-      2: 0.9,
+      Gender.AVERAGE: 0.85,
+      Gender.FEMALE: 0.8,
+      Gender.MALE: 0.9,
     }
     return thresholds_by_gender.get(gender)
   # Returns obese threshold for WHR
   def whr_obese(self, inputs: dict) -> float:
-    gender = inputs.get('gender')
+    gender = Gender(inputs.get('gender'))
     thresholds_by_gender = {
-      0: 0.925,
-      1: 0.85,
-      2: 1,
+      Gender.AVERAGE: 0.925,
+      Gender.FEMALE: 0.85,
+      Gender.MALE: 1,
     }
     return thresholds_by_gender.get(gender)
 

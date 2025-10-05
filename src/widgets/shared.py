@@ -1,5 +1,16 @@
 # Imports
 from gi.repository import Gtk, Adw, Gio
+from enum import Enum
+
+# Enums:
+
+# Should always be in the same order as the StringList of gender_input_row.
+class Gender(Enum):
+  AVERAGE = 0
+  FEMALE = 1
+  MALE = 2
+
+# Functions:
 
 # Gets the nth child of a given widget, if not found raises AttributeError.
 def get_nth_child(widget: Gtk.Widget, pos: int) -> Gtk.Widget or None:
