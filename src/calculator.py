@@ -23,10 +23,11 @@ class Calculator:
     elif age > 50: return 0.6
     else:          return 0.5
 
-
   # Returns Waist to Hip Ratio
   def whr(self, inputs: dict) -> float:
-    return inputs.get('waist') / inputs.get('hip')
+    result = inputs.get('waist') / inputs.get('hip')
+    return result
+
   # Returns overweight threshold for WHR
   def whr_overweight(self, inputs: dict) -> float:
     gender = Gender(inputs.get('gender'))

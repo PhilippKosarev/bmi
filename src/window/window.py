@@ -132,7 +132,7 @@ class BmiWindow(Adw.ApplicationWindow):
         ],
       },
       self.whr_result_row: {
-        'calc-function': calc.whtr,
+        'calc-function': calc.whr,
         'thresholds': [
           {'text': _('Healthy'),    'value': 0,                   'style': 1},
           {'text': _('Overweight'), 'value': calc.whr_overweight, 'style': 2},
