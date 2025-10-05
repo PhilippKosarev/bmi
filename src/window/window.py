@@ -263,4 +263,5 @@ class BmiWindow(Adw.ApplicationWindow):
 
   # Action after closing the app window.
   def on_close_request(self, *args):
+    settings = self.get_app().get_settings()
     settings['window-size'] = self.get_size(horizontal), self.get_size(vertical)

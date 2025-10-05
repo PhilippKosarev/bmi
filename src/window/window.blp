@@ -64,9 +64,14 @@ template $BmiWindow: Adw.ApplicationWindow {
               maximum-size: 400;
               Adw.PreferencesGroup {
                 title: _("Advanced inputs");
-                $GenderRow gender_input_row {
+                $DropDownRow gender_input_row {
+                  title: _("Gender");
+                  subtitle: _("Biological gender");
                   tooltip-text: _("Affects healthy/unhealthy thresholds for Waist to Hip ratio");
                   key: "gender";
+                  model: StringList {
+                    strings [_("Average"), _("Female"), _("Male")]
+                  };
                 }
                 $SpinRow age_input_row {
                   title: _("Age");
