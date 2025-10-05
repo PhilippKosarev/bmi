@@ -20,7 +20,7 @@
 
 # Imports
 from gi.repository import Gtk, Adw, Gio, Gdk
-import math, re
+import math, re, copy
 
 # Internal imports
 from . import widgets
@@ -225,8 +225,8 @@ class BmiWindow(Adw.ApplicationWindow):
   def calc_row_values(self, row: widgets.ResultRow, inputs: dict) -> tuple:
     info = self.result_row_info.get(row)
     calc_function = info.get('calc-function')
-    thresholds = info.get('thresholds')
     result = calc_function(inputs)
+    thresholds = copy.deepcopy(info.get('thresholds'))
     for i in range(len(thresholds)):
       threshold = thresholds[i]
       value = threshold.get('value')

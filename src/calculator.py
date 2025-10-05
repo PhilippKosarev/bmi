@@ -36,7 +36,9 @@ class Calculator:
       Gender.FEMALE: 0.8,
       Gender.MALE: 0.9,
     }
-    return thresholds_by_gender.get(gender)
+    result = thresholds_by_gender.get(gender)
+    return result
+
   # Returns obese threshold for WHR
   def whr_obese(self, inputs: dict) -> float:
     gender = Gender(inputs.get('gender'))
@@ -45,7 +47,8 @@ class Calculator:
       Gender.FEMALE: 0.85,
       Gender.MALE: 1,
     }
-    return thresholds_by_gender.get(gender)
+    result = thresholds_by_gender.get(gender)
+    return result
 
   # Returns Body Roundness Index
   def bri(self, inputs: dict) -> float:
