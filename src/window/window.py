@@ -272,7 +272,7 @@ class BmiWindow(Adw.ApplicationWindow):
     return description, thresholds
 
   def copy_result(self, row: widgets.ResultRow):
-    value = str(row.get_title())
+    value = row.get_result()
     Gdk.Clipboard.set(clipboard, value);
     self.show_toast(_("Result copied"))
 

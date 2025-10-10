@@ -32,6 +32,9 @@ class ResultRow(Adw.ActionRow):
       result = str(round(result, self.digits))
     self.label.set_label(result)
 
+  def get_result(self) -> str:
+    return self.label.get_label()
+
   def set_feedback(self, result: float, thresholds: list):
     if result is None:
       set_style(self, None)
