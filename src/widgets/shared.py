@@ -61,3 +61,16 @@ def set_style(widget: Gtk.Widget, style_index: int):
     widget.remove_css_class(style)
   if style_index is not None:
     widget.add_css_class(styles[style_index])
+
+# Conversion functions
+def kg_to_lb(value: float) -> float:
+  return value * 2.2046226218
+
+def lb_to_kg(value: float) -> float:
+  return value * 1 / kg_to_lb(1)
+
+def in_to_cm(value):
+  return value * 2.54
+
+def cm_to_in(value):
+  return value * (1 / in_to_cm(1))

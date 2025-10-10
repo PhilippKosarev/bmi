@@ -113,6 +113,10 @@ class BmiWindow(Adw.ApplicationWindow):
     self.result_row_info = {
       self.bmi_result_row: {
         'calc-function': calc.bmi,
+        'context': {
+          'calc-function': calc.bmi_and_height_to_weight,
+          'description': _("With the same height, this is what weight you need to get different BMI thresholds"),
+        },
         'thresholds': [
           {'text': _('Underweight [Severe]'),   'value': 0,    'style': 0},
           {'text': _('Underweight [Moderate]'), 'value': 16,   'style': 0},
@@ -242,12 +246,30 @@ class BmiWindow(Adw.ApplicationWindow):
       row.set_feedback(result, thresholds)
 
   def on_result_row_info_clicked(self, row: widgets.ResultRow, button: Gtk.Button):
+    settings = self.get_app().get_settings()
     dialog = widgets.ResultDialog(row)
     inputs = self.get_inputs()
     result, thresholds = self.calc_row_values(row, inputs)
     dialog.set_result(result)
     dialog.set_feedback(result, thresholds)
+    if 'context' in self.result_row_info.get(row):
+      description, thresholds = self.get_row_context(row)
+      dialog.set_context(description, thresholds, bool(settings['measurement-system']))
     dialog.present(self)
+
+  def get_row_context(self, row: widgets.ResultRow) -> tuple:
+    settings = self.get_app().get_settings()
+    info = self.result_row_info.get(row)
+    thresholds = copy.deepcopy(info.get('thresholds'))
+    context_info = info.get('context')
+    description = context_info.get('description')
+    calc_function = context_info.get('calc-function')
+    inputs = self.get_inputs()
+    for i in range(len(thresholds)):
+      threshold = thresholds[i]
+      value = calc_function(inputs, threshold.get('value'))
+      thresholds[i]['value'] = value
+    return description, thresholds
 
   def copy_result(self, row: widgets.ResultRow):
     value = str(row.get_title())

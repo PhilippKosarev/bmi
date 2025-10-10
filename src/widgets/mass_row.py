@@ -3,10 +3,7 @@ from gi.repository import GObject, Gtk, Adw
 
 # Internal imports
 from .spin_row import SpinRow
-
-# Helper functions
-def kg_to_lb(value): return value * 2.2046226218
-def lb_to_kg(value): return value * 1 / kg_to_lb(1)
+from .shared import *
 
 # Class
 class MassRow(SpinRow):

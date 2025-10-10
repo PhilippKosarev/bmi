@@ -3,10 +3,7 @@ from gi.repository import GObject, Gtk, Adw
 
 # Internal imports
 from .spin_row import SpinRow
-
-# Helper functions
-def in_to_cm(value): return value * 2.54
-def cm_to_in(value): return value * (1 / in_to_cm(1))
+from .shared import *
 
 # Class
 class DistanceRow(SpinRow):

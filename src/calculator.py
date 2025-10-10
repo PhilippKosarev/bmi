@@ -9,13 +9,22 @@ class Calculator:
 
   # Returns BMI
   def bmi(self, inputs: dict):
-    return inputs.get('mass') / ((inputs.get('height') / 100) ** 2)
+    mass = inputs.get('mass')
+    height = inputs.get('height')
+    result = mass / ((height / 100) ** 2)
+    return result
+
+  def bmi_and_height_to_weight(self, inputs: dict, bmi: float):
+    height = inputs.get('height')
+    mass = bmi * ((height / 100) ** 2)
+    return mass
 
   # Returns Waist To Height Ratio
   def whtr(self, inputs: dict) -> float:
     waist = inputs.get('waist')
     height = inputs.get('height')
     return waist / height
+
   # Returns health thresholds for WHTR
   def whtr_unhealthy(self, inputs: dict):
     age = inputs.get('age')
