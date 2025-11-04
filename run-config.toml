@@ -20,3 +20,10 @@ building = [
   "flatpak-builder --force-clean $build-dir $manifest",
 ]
 running = "flatpak-builder --run $build-dir $manifest $bin"
+
+[builds.update-translations]
+updating = [
+  "meson setup $build-dir",
+  "meson compile -C $build-dir $bin-pot",
+  "meson compile -C $build-dir $bin-update-po",
+]

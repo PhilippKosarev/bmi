@@ -93,3 +93,7 @@ for msg in selected_build:
         sys.exit(1)
   else:
     raise NotImplementedError()
+
+# Deleting build dir
+if os.path.isdir(build_dir):
+  shutil.rmtree(build_dir)
