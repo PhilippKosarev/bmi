@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: BMI v3.0\n"
-"Report-Msgid-Bugs-To: https://github.com/PhilippKosarev/bmi/issues\n"
-"POT-Creation-Date: 2025-05-08 19:37+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-10 23:34+0100\n"
 "PO-Revision-Date: 2025-05-24 18:19+0300\n"
 "Last-Translator: Maksym Dilanian <maksym@dilanian.xyz>\n"
 "Language-Team: Ukrainian <trans-uk@lists.fedoraproject.org>\n"
@@ -18,10 +18,9 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#. Basic window properties
 #: data/io.github.philippkosarev.bmi.desktop.in:2
-#: data/io.github.philippkosarev.bmi.metainfo.xml.in:7 src/window.py:211
-#: src/window.py:228 src/window.blp:6 src/window.blp:38 src/window.blp:56
+#: data/io.github.philippkosarev.bmi.metainfo.xml.in:7
+#: src/window/window.blp:109
 msgid "BMI"
 msgstr "ІМТ"
 
@@ -65,351 +64,243 @@ msgstr "ІМТ Розширений режим Темна тема"
 msgid "BMI Advanced Mode Light Theme"
 msgstr "ІМТ Розширений режим Світла тема"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:6
-msgid "Forget height and weight on quit"
-msgstr "Забути зріст і вагу при завершенні"
+#: data/io.github.philippkosarev.bmi.gschema.xml:7
+msgid "Window size"
+msgstr ""
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:10
-#: data/io.github.philippkosarev.bmi.gschema.xml:18
+#: data/io.github.philippkosarev.bmi.gschema.xml:12
+#, fuzzy
+msgid "Toggles Advanced Mode"
+msgstr "Вмикає/вимикає розширений режим"
+
+#: data/io.github.philippkosarev.bmi.gschema.xml:17
+#: src/preferences/preferences.blp:25
+msgid "Remember inputs"
+msgstr ""
+
+#: data/io.github.philippkosarev.bmi.gschema.xml:22
 msgid "Whether the app uses metric or imperial units"
 msgstr "Чи використовує програма метричні чи імперські одиниці вимірювання"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:14
-#: data/io.github.philippkosarev.bmi.gschema.xml:22
+#: data/io.github.philippkosarev.bmi.gschema.xml:27
 msgid "Height in centimetres or inches"
 msgstr "Висота в сантиметрах або дюймах"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:18
-#: data/io.github.philippkosarev.bmi.gschema.xml:26
+#: data/io.github.philippkosarev.bmi.gschema.xml:32
 msgid "Weight in kilograms or pounds"
 msgstr "Вага в кілограмах або фунтах"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:22
-msgid "Toggles Advanced mode"
-msgstr "Вмикає/вимикає розширений режим"
-
-#: data/io.github.philippkosarev.bmi.gschema.xml:26
-#: data/io.github.philippkosarev.bmi.gschema.xml:30
+#: data/io.github.philippkosarev.bmi.gschema.xml:37
 msgid "Years since birth"
 msgstr "Років з дня народження"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:30
-#: data/io.github.philippkosarev.bmi.gschema.xml:34
+#: data/io.github.philippkosarev.bmi.gschema.xml:42 src/window/window.blp:70
 msgid "Biological gender"
 msgstr "Біологічна стать"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:34
-#: data/io.github.philippkosarev.bmi.gschema.xml:38
+#: data/io.github.philippkosarev.bmi.gschema.xml:47
 msgid "Waist circumference in centimeters"
 msgstr "Обхват талії в сантиметрах"
 
-#: data/io.github.philippkosarev.bmi.gschema.xml:38
-#: data/io.github.philippkosarev.bmi.gschema.xml:42
+#: data/io.github.philippkosarev.bmi.gschema.xml:52
 msgid "Hip circumference in centimeters"
 msgstr "Обхват стегон у сантиметрах"
 
-#: src/window.py:58 src/window.py:59
-msgid "Show About"
-msgstr "Про програму"
+#: src/main.py:86
+msgid "Translators"
+msgstr ""
 
-#: src/window.py:76 src/window.py:77
-msgid "Switch to imperial units"
-msgstr "Перейти на імперські одиниці"
+#: src/window/window.py:118
+msgid ""
+"With the same height, this is what weight you need to get different BMI "
+"thresholds"
+msgstr ""
 
-#: src/window.py:81 src/window.py:82
-msgid "Forget input values after closing"
-msgstr "Забути введені значення після закриття"
+#: src/window/window.py:121
+msgid "Underweight [Severe]"
+msgstr "Недостатня вага [Виражена]"
 
-#: src/window.py:104 src/window.py:260 src/window.py:259 src/window.py:105
-#: src/window.py:369 src/window.blp:30 src/window.blp:42
-msgid "Inputs"
-msgstr "Введення"
+#: src/window/window.py:122
+msgid "Underweight [Moderate]"
+msgstr "Недостатня вага [Помірна]"
 
-#. Height input
-#: src/window.py:108 src/window.py:228 src/window.py:227 src/window.py:110
-#: src/window.py:66 src/window.py:117
-msgid "Height"
-msgstr "Висота"
+#: src/window/window.py:123
+msgid "Underweight [Mild]"
+msgstr "Недостатня вага [Незначна]"
 
-#. Weight input
-#: src/window.py:111 src/window.py:229 src/window.py:228 src/window.py:114
-#: src/window.py:70 src/window.py:121
-msgid "Weight"
-msgstr "Вага"
+#: src/window/window.py:124 src/window/window.py:134 src/window/window.py:141
+msgid "Healthy"
+msgstr "Здоровий"
 
-#: src/window.py:120 src/window.py:128 src/window.blp:33 src/window.blp:48
-msgid "Advanced inputs"
-msgstr "Розширені введення"
+#: src/window/window.py:125 src/window/window.py:142
+msgid "Overweight"
+msgstr "Надлишкова вага"
 
-#. Gender input
-#: src/window.py:123 src/window.py:133 src/bmi_widgets.py:162 src/window.py:79
-#: src/widgets/gender_row.py:14 src/window.py:130 src/widgets/gender_row.py:15
-msgid "Gender"
-msgstr "Стать"
+#: src/window/window.py:126
+msgid "Obese [Class 1]"
+msgstr "Ожиріння [I ступеню]"
 
-#: src/window.py:124 src/window.py:135 src/window.py:81 src/window.py:132
-msgid "Affects healthy/unhealthy thresholds for Waist to Hip ratio"
-msgstr "Впливає на здорові/нездорові пороги співвідношення талії до стегон"
+#: src/window/window.py:127
+msgid "Obese [Class 2]"
+msgstr "Ожиріння [II ступеню]"
 
-#: src/window.py:127 src/window.py:391 src/window.py:134 src/window.py:269
-#: src/window.py:144 src/widgets/gender_row.py:10 src/window.py:195
+#: src/window/window.py:128
+msgid "Obese [Class 3]"
+msgstr "Ожиріння [III ступеню]"
+
+#: src/window/window.py:135
+msgid "Unhealthy"
+msgstr "Нездоровий"
+
+#: src/window/window.py:143
+msgid "Obese"
+msgstr "Ожиріння"
+
+#: src/window/window.py:149
+msgid "Very lean"
+msgstr "Дуже худий"
+
+#: src/window/window.py:150
+msgid "Lean"
+msgstr "Худий"
+
+#: src/window/window.py:151 src/window/window.blp:74
 msgid "Average"
 msgstr "Середнє"
 
-#: src/window.py:127 src/window.py:134 src/widgets/gender_row.py:10
+#: src/window/window.py:152
+msgid "Above average"
+msgstr "Вище середнього"
+
+#: src/window/window.py:153
+msgid "High"
+msgstr "Високий"
+
+#: src/window/window.py:277
+msgid "Result copied"
+msgstr "Результат скопійовано"
+
+#: src/window/window.blp:45
+msgid "Inputs"
+msgstr "Введення"
+
+#: src/window/window.blp:47
+msgid "Height"
+msgstr "Висота"
+
+#: src/window/window.blp:48
+msgid "Affects BMI and BRI"
+msgstr "Впливає на ІМТ та ІОТ"
+
+#: src/window/window.blp:54
+msgid "Weight"
+msgstr "Вага"
+
+#: src/window/window.blp:55
+msgid "Affects BMI"
+msgstr "Впливає на ІМТ"
+
+#: src/window/window.blp:67
+msgid "Advanced inputs"
+msgstr "Розширені введення"
+
+#: src/window/window.blp:69
+msgid "Gender"
+msgstr "Стать"
+
+#: src/window/window.blp:71
+msgid "Affects healthy/unhealthy thresholds for Waist to Hip ratio"
+msgstr "Впливає на здорові/нездорові пороги співвідношення талії до стегон"
+
+#: src/window/window.blp:74
 msgid "Female"
 msgstr "Жінка"
 
-#: src/window.py:127 src/window.py:134 src/widgets/gender_row.py:10
+#: src/window/window.blp:74
 msgid "Male"
 msgstr "Чоловік"
 
-#. Age input
-#: src/window.py:135 src/window.py:137 src/window.py:83 src/window.py:134
+#: src/window/window.blp:78
 msgid "Age"
 msgstr "Вік"
 
-#: src/window.py:135 src/window.py:139 src/window.py:85 src/window.py:136
+#: src/window/window.blp:79 src/widgets/time_row.py:12
+msgid "Years"
+msgstr "Років"
+
+#: src/window/window.blp:80
 msgid "Affects healthy/unhealthy thresholds for Waist to Height ratio"
 msgstr "Впливає на здорові/нездорові пороги співвідношення талії до зросту"
 
-#. Waist circumference
-#: src/window.py:139 src/window.py:141 src/window.py:87 src/window.py:138
+#: src/window/window.blp:87
 msgid "Waist"
 msgstr "Талія"
 
-#: src/window.py:139 src/window.py:143 src/window.py:89 src/window.py:140
+#: src/window/window.blp:88
 msgid "Affects Waist to Height ratio, Waist to Hip ratio and BRI"
 msgstr ""
 "Впливає на співвідношення талії до зросту, співвідношення талії до стегон та "
 "ІОТ"
 
-#. Hip circumference
-#: src/window.py:142 src/window.py:145 src/window.py:91
+#: src/window/window.blp:94
 msgid "Hip"
 msgstr "Стегно"
 
-#: src/window.py:142 src/window.py:147 src/window.py:93 src/window.py:144
+#: src/window/window.blp:95
 msgid "Affects Waist to Hip ratio"
 msgstr "Впливає на співвідношення талії та стегон"
 
-#: src/window.py:156
-msgid "BMI:"
-msgstr "ІМТ:"
-
-#: src/window.py:161
-msgid "Copy BMI"
-msgstr "Скопіювати ІМТ"
-
-#: src/window.py:177 src/window.py:170 src/window.blp:36 src/window.blp:54
+#: src/window/window.blp:107
 msgid "Results"
 msgstr "Результати"
 
-#: src/window.py:180 src/window.py:212 src/window.py:229 src/window.blp:39
-#: src/window.blp:57
+#: src/window/window.blp:110
 msgid "Body Mass Index"
 msgstr "Індекс Маси Тіла"
 
-#: src/window.py:181 src/window.py:243 src/window.blp:42 src/window.blp:60
+#: src/window/window.blp:114
 msgid "Waist / Height"
 msgstr "Талія / Зріст"
 
-#: src/window.py:181 src/window.py:244 src/window.blp:43 src/window.blp:61
+#: src/window/window.blp:115
 msgid "Waist to height ratio"
 msgstr "Співвідношення талії до зросту"
 
-#: src/window.py:182 src/window.py:252 src/window.blp:46 src/window.blp:64
+#: src/window/window.blp:119
 msgid "Waist / Hip"
 msgstr "Талія / Стегна"
 
-#: src/window.py:182 src/window.py:253 src/window.blp:47 src/window.blp:65
+#: src/window/window.blp:120
 msgid "Waist to hip ratio"
 msgstr "Співвідношення талії до стегон"
 
-#: src/window.py:183 src/window.py:262 src/window.blp:50 src/window.blp:68
+#: src/window/window.blp:124
 msgid "BRI"
 msgstr "ІОТ"
 
-#: src/window.py:183 src/window.py:263 src/window.blp:39 src/window.blp:51
-#: src/window.blp:69
+#: src/window/window.blp:125
 msgid "Body Roundness Index"
 msgstr "Індекс Округлості Тіла"
 
-#: src/window.py:286 src/window.py:284 src/bmi_widgets.py:52
-#: src/bmi_widgets.py:84 src/widgets/distance_row.py:20
-#: src/widgets/distance_row.py:68 src/widgets/distance_row.py:21
-#: src/widgets/distance_row.py:69
-msgid "Centimetres"
-msgstr "Сантиметрів"
-
-#: src/window.py:287 src/window.py:285 src/bmi_widgets.py:98
-#: src/bmi_widgets.py:130 src/widgets/mass_row.py:20 src/widgets/mass_row.py:68
-#: src/widgets/mass_row.py:21 src/widgets/mass_row.py:69
-msgid "Kilograms"
-msgstr "Кілограмів"
-
-#: src/window.py:289 src/window.py:287 src/bmi_widgets.py:81
-#: src/widgets/distance_row.py:65 src/widgets/distance_row.py:66
-msgid "Inches"
-msgstr "Дюймів"
-
-#: src/window.py:290 src/window.py:288 src/bmi_widgets.py:127
-#: src/widgets/mass_row.py:65 src/widgets/mass_row.py:66
-msgid "Pounds"
-msgstr "Фунтів"
-
-#: src/window.py:386 src/window.py:343 src/window.py:215
-msgid "Underweight"
-msgstr "Недостатня вага"
-
-#: src/window.py:387 src/window.py:398 src/window.py:424 src/window.py:344
-#: src/window.py:358 src/window.py:370 src/window.py:379 src/window.py:216
-#: src/window.py:236 src/window.py:248 src/window.py:257 src/window.py:111
-#: src/window.py:123 src/window.py:132 src/window.py:162 src/window.py:174
-#: src/window.py:183
-msgid "Healthy"
-msgstr "Здоровий"
-
-#: src/window.py:388 src/window.py:399 src/window.py:416 src/window.py:425
-#: src/window.py:345 src/window.py:359 src/window.py:380 src/window.py:217
-#: src/window.py:237 src/window.py:258 src/window.py:112 src/window.py:133
-#: src/window.py:163 src/window.py:184
-msgid "Overweight"
-msgstr "Надлишкова вага"
-
-#: src/window.py:389 src/window.py:417 src/window.py:426 src/window.py:346
-#: src/window.py:381 src/window.py:218 src/window.py:259 src/window.py:134
-#: src/window.py:185
-msgid "Obese"
-msgstr "Ожиріння"
-
-#: src/window.py:390 src/window.py:427 src/window.py:347 src/window.py:219
-msgid "Extremely obese"
-msgstr "Надзвичайне ожиріння"
-
-#: src/window.py:395 src/window.py:355 src/window.py:233 src/window.py:108
-#: src/window.py:159
-msgid "Underweight [Severe]"
-msgstr "Недостатня вага [Виражена]"
-
-#: src/window.py:396 src/window.py:356 src/window.py:234 src/window.py:109
-#: src/window.py:160
-msgid "Underweight [Moderate]"
-msgstr "Недостатня вага [Помірна]"
-
-#: src/window.py:397 src/window.py:357 src/window.py:235 src/window.py:110
-#: src/window.py:161
-msgid "Underweight [Mild]"
-msgstr "Недостатня вага [Незначна]"
-
-#: src/window.py:400 src/window.py:360 src/window.py:238 src/window.py:113
-#: src/window.py:164
-msgid "Obese [Class 1]"
-msgstr "Ожиріння [I ступеню]"
-
-#: src/window.py:401 src/window.py:361 src/window.py:239 src/window.py:114
-#: src/window.py:165
-msgid "Obese [Class 2]"
-msgstr "Ожиріння [II ступеню]"
-
-#: src/window.py:402 src/window.py:362 src/window.py:240 src/window.py:115
-#: src/window.py:166
-msgid "Obese [Class 3]"
-msgstr "Ожиріння [III ступеню]"
-
-#: src/window.py:409 src/window.py:371 src/window.py:249 src/window.py:124
-#: src/window.py:175
-msgid "Unhealthy"
-msgstr "Нездоровий"
-
-#: src/window.py:423 src/window.py:389 src/window.py:267 src/window.py:142
-#: src/window.py:193
-msgid "Very lean"
-msgstr "Дуже худий"
-
-#: src/window.py:477 src/window.py:472 src/bmi_widgets.py:226
-#: src/bmi_widgets.py:297 src/window.py:217 src/window.py:300
-msgid "Result copied"
-msgstr "Результат скопійовано"
-
-#: src/window.py:390 src/window.py:268 src/window.py:143 src/window.py:194
-msgid "Lean"
-msgstr "Худий"
-
-#: src/window.py:392 src/window.py:270 src/window.py:145 src/window.py:196
-msgid "Above average"
-msgstr "Вище середнього"
-
-#: src/window.py:393 src/window.py:271 src/window.py:146 src/window.py:197
-msgid "High"
-msgstr "Високий"
-
-#: src/window.py:65
-msgid "Basic"
-msgstr "Спрощений"
-
-#: src/window.py:65
-msgid "Advanced"
-msgstr "Розширений"
-
-#: src/window.py:112 src/window.py:68 src/window.py:119
-msgid "Affects BMI and BRI"
-msgstr "Впливає на ІМТ та ІОТ"
-
-#: src/window.py:116 src/window.py:72 src/window.py:123
-msgid "Affects BMI"
-msgstr "Впливає на ІМТ"
-
-#: src/window.py:393
-msgid "Sultaniiazov David https://github.com/x1z53"
-msgstr ""
-
-#: src/bmi_widgets.py:144 src/widgets/time_row.py:11 src/widgets/time_row.py:12
-msgid "Years"
-msgstr "Років"
-
-#: src/bmi_widgets.py:210
-msgid "Copy result"
-msgstr "Копіювати результат"
-
-#: data/io.github.philippkosarev.bmi.gschema.xml:6
-msgid "Window size"
-msgstr ""
-
-#: data/io.github.philippkosarev.bmi.gschema.xml:10
-#, fuzzy
-msgid "Toggles Advanced Mode"
-msgstr "Вмикає/вимикає розширений режим"
-
-#: data/io.github.philippkosarev.bmi.gschema.xml:14
-#: src/preferences/preferences.blp:29
-msgid "Remember inputs"
-msgstr ""
-
-#: src/main.py:68
-msgid "Translators"
-msgstr ""
-
-#: src/window.blp:62 src/preferences/preferences.blp:8 src/window.blp:82
+#: src/window/window.blp:140 src/preferences/preferences.blp:8
 msgid "Preferences"
 msgstr ""
 
-#: src/window.blp:66 src/window.blp:86
+#: src/window/window.blp:144
 #, fuzzy
 msgid "About BMI"
 msgstr "Впливає на ІМТ"
 
-#: src/preferences/preferences.blp:10
-#, fuzzy
-msgid "Input"
-msgstr "Введення"
+#: src/preferences/preferences.py:58
+msgid "Error setting preferences value"
+msgstr ""
 
 #: src/preferences/preferences.blp:12
 #, fuzzy
 msgid "Advanced mode"
 msgstr "Вмикає/вимикає розширений режим"
 
-#: src/preferences/preferences.blp:19
+#: src/preferences/preferences.blp:17
 msgid "Measurement system"
 msgstr ""
 
@@ -420,3 +311,92 @@ msgstr ""
 #: src/preferences/preferences.blp:21
 msgid "Imperial"
 msgstr ""
+
+#: src/widgets/distance_row.py:18 src/widgets/distance_row.py:44
+msgid "Centimetres"
+msgstr "Сантиметрів"
+
+#: src/widgets/distance_row.py:41
+msgid "Inches"
+msgstr "Дюймів"
+
+#: src/widgets/mass_row.py:18 src/widgets/mass_row.py:41
+msgid "Kilograms"
+msgstr "Кілограмів"
+
+#: src/widgets/mass_row.py:38
+msgid "Pounds"
+msgstr "Фунтів"
+
+#: src/widgets/result_dialog.py:41
+msgid "Under {}"
+msgstr ""
+
+#: src/widgets/result_dialog.py:43
+msgid "Over {}"
+msgstr ""
+
+#: src/widgets/result_dialog.py:45
+msgid "From {} to {}"
+msgstr ""
+
+#: src/widgets/result_dialog.py:115
+msgid "lb"
+msgstr ""
+
+#: src/widgets/result_dialog.py:121
+msgid "kg"
+msgstr ""
+
+#: src/widgets/result_dialog.blp:22
+#, fuzzy
+msgid "Result"
+msgstr "Результати"
+
+#: src/widgets/result_dialog.blp:39
+msgid "Thresholds"
+msgstr ""
+
+#: src/widgets/result_dialog.blp:43
+msgid "Additional context"
+msgstr ""
+
+#~ msgid "Forget height and weight on quit"
+#~ msgstr "Забути зріст і вагу при завершенні"
+
+#~ msgid "Toggles Advanced mode"
+#~ msgstr "Вмикає/вимикає розширений режим"
+
+#~ msgid "Show About"
+#~ msgstr "Про програму"
+
+#~ msgid "Switch to imperial units"
+#~ msgstr "Перейти на імперські одиниці"
+
+#~ msgid "Forget input values after closing"
+#~ msgstr "Забути введені значення після закриття"
+
+#~ msgid "BMI:"
+#~ msgstr "ІМТ:"
+
+#~ msgid "Copy BMI"
+#~ msgstr "Скопіювати ІМТ"
+
+#~ msgid "Underweight"
+#~ msgstr "Недостатня вага"
+
+#~ msgid "Extremely obese"
+#~ msgstr "Надзвичайне ожиріння"
+
+#~ msgid "Basic"
+#~ msgstr "Спрощений"
+
+#~ msgid "Advanced"
+#~ msgstr "Розширений"
+
+#~ msgid "Copy result"
+#~ msgstr "Копіювати результат"
+
+#, fuzzy
+#~ msgid "Input"
+#~ msgstr "Введення"
