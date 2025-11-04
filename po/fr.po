@@ -1,4 +1,4 @@
-# BMI pot
+# French translation for BMI
 # Copyright (C) 2025 Philipp Kosarev
 # This file is distributed under the same license as the BMI package.
 # Philipp Kosarev <philipp.kosarev@gmail.com>, 2025.

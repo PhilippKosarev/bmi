@@ -70,6 +70,8 @@ class BmiApplication(Adw.Application):
       application_icon  = self.get_id(),
       version           = self.get_version(),
       developer_name    = 'Philipp Kosarev',
+      website      = "https://github.com/philippkosarev/bmi",
+      issue_url    = "https://github.com/philippkosarev/bmi/issues",
       developers = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
         'vikdevelop https://github.com/vikdevelop',
@@ -77,17 +79,15 @@ class BmiApplication(Adw.Application):
       artists = [
         'Philipp Kosarev https://github.com/PhilippKosarev',
       ],
+      translator_credits = '\n'.join([
+        'David Sultaniiazov <x1z53@alt-gnome.ru>',
+        'Maksym Dilanian <maksym@dilanian.xyz>',
+        'Albano Battistella <albanobattistella@gmail.com>',
+        'Renato Tavares <dr.renatotavares@gmail.com>',
+        'Marcos Sánchez https://github.com/haggen88',
+      ]),
       copyright    = '© 2024 Philipp Kosarev',
       license_type = 'GTK_LICENSE_GPL_2_0',
-      website      = "https://github.com/philippkosarev/bmi",
-      issue_url    = "https://github.com/philippkosarev/bmi/issues",
-    )
-    about.add_credit_section(
-      _("Translators"),
-      [
-        'Sultaniiazov David https://github.com/x1z53',
-        'Maksym Dilanian https://github.com/maksym-dilanian',
-      ],
     )
     about.present(self.props.active_window)
 

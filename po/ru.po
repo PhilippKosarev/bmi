@@ -1,4 +1,4 @@
-# Russian translations for bmi package.
+# Russian translation for BMI
 # Copyright (C) 2025 THE bmi'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the bmi package.
 # Automatically generated, 2025.
