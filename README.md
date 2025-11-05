@@ -1,6 +1,6 @@
 <h1>BMI</h1>
 
-BMI is an open-source, body mass index calculator built with GTK4 and LibAdwaita.
+An open-source calculator for body health metrics, built with GTK4 and LibAdwaita.
 
 <img width='640' alt='Download on Flathub' src='screenshots/advanced-dark.png'/>
 
@@ -26,6 +26,7 @@ This project is built using <a href='https://apps.gnome.org/en-GB/Builder'>Gnome
 - python
 - PyGObject
 - blueprint-compiler
+- meson
 - flatpak-builder
 
 <h3>Running</h3>
@@ -35,4 +36,3 @@ Use the project's runner script:
 ./run native # Native build
 ./run flatpak # Flatpak build
 ```
-or manually run the commands from `run-config.toml`.
