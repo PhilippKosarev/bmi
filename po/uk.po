@@ -184,7 +184,7 @@ msgstr "Результат скопійовано"
 
 #: src/window/window.blp:45
 msgid "Inputs"
-msgstr "Введення"
+msgstr "Вхідні дані"
 
 #: src/window/window.blp:47
 msgid "Height"
@@ -204,7 +204,7 @@ msgstr "Впливає на ІМТ"
 
 #: src/window/window.blp:67
 msgid "Advanced inputs"
-msgstr "Розширені введення"
+msgstr "Розширені вхідні дані"
 
 #: src/window/window.blp:69
 msgid "Gender"
@@ -246,7 +246,7 @@ msgstr ""
 
 #: src/window/window.blp:94
 msgid "Hip"
-msgstr "Стегно"
+msgstr "Стегна"
 
 #: src/window/window.blp:95
 msgid "Affects Waist to Hip ratio"
