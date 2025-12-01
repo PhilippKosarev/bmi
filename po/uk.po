@@ -291,7 +291,7 @@ msgstr "Налаштування"
 #: src/window/window.blp:144
 #, fuzzy
 msgid "About BMI"
-msgstr "Про BMI"
+msgstr "Про ІМТ"
 
 #: src/preferences/preferences.py:58
 msgid "Error setting preferences value"
