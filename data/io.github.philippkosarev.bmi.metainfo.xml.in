@@ -77,7 +77,7 @@
   </supports>
 
   <releases>
-    <release version="v4.1" date="2025-10-05">
+    <release version="v4.1" date="2025-12-02">
       <url type="details">https://github.com/PhilippKosarev/bmi/releases/tag/v4.1</url>
       <description translate="no">
         <p>Version 4.1</p>
