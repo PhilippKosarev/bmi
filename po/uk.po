@@ -138,8 +138,7 @@ msgid "Overweight"
 msgstr "Надлишкова вага"
 
 #: src/window/window.py:126
-msgid "Obese
- [Class 1]"
+msgid "Obese [Class 1]"
 msgstr "Ожиріння [I ступеню]"
 
 #: src/window/window.py:127
