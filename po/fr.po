@@ -113,12 +113,12 @@ msgid ""
 "With the same height, this is what weight you need to get different BMI "
 "thresholds"
 msgstr ""
-"Avec la même taille, voici le poids dont vous avez besoin pour atteindre "
+"Avec la même taille, voici le poids que vous devez faire pour atteindre "
 "différents seuils d'IMC"
 
 #: src/window/window.py:121
 msgid "Underweight [Severe]"
-msgstr "Maigreur[Sévère]"
+msgstr "Maigreur [Sévère]"
 
 #: src/window/window.py:122
 msgid "Underweight [Moderate]"
@@ -210,7 +210,7 @@ msgstr "Sexe"
 
 #: src/window/window.blp:71
 msgid "Affects healthy/unhealthy thresholds for Waist to Hip ratio"
-msgstr "Affecte les seuils sain/malsain pour le rapport Taille/Hanches"
+msgstr "Affecte les seuils sain/malsain pour le rapport taille/hanches"
 
 #: src/window/window.blp:74
 msgid "Female"
@@ -230,7 +230,7 @@ msgstr "Années"
 
 #: src/window/window.blp:80
 msgid "Affects healthy/unhealthy thresholds for Waist to Height ratio"
-msgstr "Affecte les seuils sain/malsain pour le rapport Taille/Hauteur"
+msgstr "Affecte les seuils sain/malsain pour le rapport taille/hauteur"
 
 #: src/window/window.blp:87
 msgid "Waist"
@@ -238,7 +238,7 @@ msgstr "Tour de taille"
 
 #: src/window/window.blp:88
 msgid "Affects Waist to Height ratio, Waist to Hip ratio and BRI"
-msgstr "Affecte le rapport Taille/Hauteur, le rapport Taille/Hanches et l'IRC"
+msgstr "Affecte le rapport taille/hauteur, le rapport taille/hanches et l'IRC"
 
 #: src/window/window.blp:94
 msgid "Hip"
@@ -246,7 +246,7 @@ msgstr "Hanches"
 
 #: src/window/window.blp:95
 msgid "Affects Waist to Hip ratio"
-msgstr "Affecte le rapport Taille/Hanches"
+msgstr "Affecte le rapport taille/hanches"
 
 #: src/window/window.blp:107
 msgid "Results"
@@ -266,11 +266,11 @@ msgstr "Rapport taille/hauteur"
 
 #: src/window/window.blp:119
 msgid "Waist / Hip"
-msgstr "Tour de taille / Hanches"
+msgstr "Taille / Hanches"
 
 #: src/window/window.blp:120
 msgid "Waist to hip ratio"
-msgstr "Rapport tour de taille/hanches"
+msgstr "Rapport taille/hanches"
 
 #: src/window/window.blp:124
 msgid "BRI"
